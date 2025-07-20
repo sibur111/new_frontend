@@ -6,8 +6,6 @@ import Cookies from "js-cookie";
 import http from "../http-common"
 import { get } from "http";
 import { useSearchParams } from 'next/navigation';
-
-
 const Startpage = () => {
     const router = useRouter();
     const [items, setItems] = useState([]);
