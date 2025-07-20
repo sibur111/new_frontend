@@ -124,7 +124,7 @@ const Mainpage = ({Image, FAQImg, one, two, three, SiburLogo} : Props) => {
                     <input type="password" onChange={(e) => setPassword(e.target.value)}  placeholder="Пароль" className="w-full p-2 mb-4 border-2 border-teal-600 rounded-lg text-teal-600 focus:ring focus:border-teal-900" />
                   </div>
                   <div className="flex justify-end">
-                    <button onClick={upload} className="font-sans font-semibold text-xl rounded-lg w-1/2 bg-red-500 text-white p-2">Войти</button>
+                    <button onClick={upload} className="active:shadow-none hover:shadow-lg font-sans font-semibold text-xl rounded-lg w-1/2 bg-red-500 text-white p-2">Войти</button>
                   </div>
               </form>
             </section>

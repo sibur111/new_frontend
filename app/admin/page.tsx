@@ -14,7 +14,7 @@ const Admin = () => {
     const router = useRouter();
     const [accept, setAccept] = useState(false)
     const routering = () => {
-        router.replace("/start")
+        router.push("/start")
     }
     const addUser = () => {
         router.push("/add")
@@ -54,7 +54,7 @@ const Admin = () => {
   }, [router]);
 
   if (!accept) {
-    return <div>Loading...</div>; // Отображаем загрузку, пока проверяется токен
+    return <div>Loading...</div>; 
   }  
     return (
         <div className="admin subtitle min-h-screen ">
@@ -71,11 +71,16 @@ const Admin = () => {
             <p className="text-white text-5xl font-bold mb-20 mt-10 ml-40 ">Панель администратора</p>
             <div className="flex justify-between">
                 <img src={'https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2F72a19f13f63c49f1ba69c3f640c81f50?format=webp&width=800'} className="ml-40"/>
-                <button onClick={routering} className=" font-sans mx-40 text-center h-10 font-semibold text-2xl rounded-lg bg-linear-to-r from-orange-600 to-red-600 text-white p-2">Подобрать сырье</button>
-                <div>
-                    <button onClick={addUser} className="font-sans mx-40 text-center w-1/4 h-10 font-semibold text-2xl rounded-lg bg-linear-to-r inp text-white p-2">Пользователи</button>
-                    <button onClick={dataRouter} className="font-sans mx-40 text-center w-1/4 h-10 font-semibold text-2xl rounded-lg bg-linear-to-r inp text-white p-2">Добавить данные</button>
+                <div className="flex-col relative mr-40">
+                  <div>
+                    <button onClick={routering} className=" font-sans mx-40 w-2/3 text-center h-10 flex items-center justify-center font-semibold text-2xl rounded-lg bg-linear-to-r from-orange-600 to-red-600 text-white p-2 active:shadow-none hover:shadow-lg">Подобрать сырье</button>
+                  </div>
+                  <div className="bottom-0 absolute">
+                      <button onClick={addUser} className="font-sans flex items-center justify-center mx-40 text-center w-2/3 h-10 font-semibold text-2xl rounded-lg bg-linear-to-r inp text-white p-2 active:shadow-none hover:shadow-lg">Пользователи</button>
+                      <button onClick={dataRouter} className="flex items-center justify-center font-sans mx-40 text-center w-2/3 h-10 font-semibold text-2xl rounded-lg bg-linear-to-r inp text-white p-2 m-5 active:shadow-none hover:shadow-lg">Добавить данные</button>
+                  </div>
                 </div>
+                
             </div>
             
         </div>
