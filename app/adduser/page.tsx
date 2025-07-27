@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import http from "../http-common"
 import Cookies from "js-cookie";
 import DropdownRoles from "../components/DropdownRoles";
-import { useSearchParams } from 'next/navigation';
 
 const AddUserPage = () => {
     const router : any = useRouter();
@@ -13,8 +12,6 @@ const AddUserPage = () => {
     const [pas, setPass] = useState('');
     const [rol, setRol] = useState(null);
     const [usdt, setUsdt] = useState('');
-    const searchParams = useSearchParams();
-    const selected = searchParams.get('rol');
     const adduser = async () => {
         try{
             const token = Cookies.get('token'); 
