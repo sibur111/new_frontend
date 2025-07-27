@@ -12,6 +12,7 @@ const Startpage = () => {
     const [items, setItems] = useState([]);
     const [error, setError] = useState(null);
     const [accept, setAccept] = useState(false)
+    const [errorinput, seErrorInput] = useState(false);
     const [target_formula, setSelectedProduct] = useState(null);
     const [result_mass, setMass] = useState('20');
     const [main_percent, setPure] = useState('>98');
@@ -84,14 +85,14 @@ const Startpage = () => {
         isValid = false;
       }
 
-      if (!result_mass || Number(result_mass) <= 0) {
+      if (!result_mass || Number(result_mass) <= 0 ) {
         newErrors.result_mass = 'Масса должна быть положительным числом';
         isValid = false;
       }
 
       const validatePercent = (value : any, field : any) => {
         if (!value) {
-          return `${field} обязателен`;
+          return `${field} обязателен. Используйте число, диапазон (например, 0.1-0.3) или неравенство (например, <0.015)`;
         }
         const rangeRegex = /^(\d*\.?\d+)-(\d*\.?\d+)$/;
         const inequalityRegex = /^(>|<|>=|<=)(\d*\.?\d+)$/;
@@ -240,16 +241,19 @@ const Startpage = () => {
     return <div>Loading...</div>;
   }  
 
-
+const LogOut = () => {
+      Cookies.remove('token')
+      router.replace('/#')
+    }
 return (
   (accept && <div className="bg-gradient-to-b from-[#006771] to-[#023136] subtitle min-h-screen ">
     <div className="pt-5 title">
       <header className="hidden md:flex items-center parent mx-auto px-10 py-1 w-full text-sm text-white bg-cyan-900 max-w-[1026px] rounded-2xl md:rounded-full max-md:px-5 max-md:max-w-full">
-        <a href="#" className="font-semibold">GibbSITE</a>
+        <a href="/#">
+          <img src={'/gibbsite.png'} className="h-5 m-2" />
+        </a>
         <nav className="ml-auto items-center p-2">
-          <a href="#" className="mr-12 font-semibold">Как это работает?</a>
-          <a href="#" className="mr-12 font-semibold">FAQ</a>
-          <a href="#" className="font-sans font-semibold">Войти</a>
+          <a href="#" onClick={LogOut} className="font-sans font-semibold hover:text-orange-600 transition-colors duration-200">Выйти</a>
         </nav>
       </header>
     </div>
