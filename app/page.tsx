@@ -4,21 +4,13 @@ import React, { useState, useRef} from 'react';
 import http from "./http-common"
 import { Toaster, toast } from "sonner";
 import Cookies from 'js-cookie'
-interface Props {
-  Image: "https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2F797b43e33b054d31870a53751f6e3a2e?format=webp&width=800";
-   one: "https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2Fd6971021b459450ca4d463e000052a01?format=webp&width=800";
-    two : "https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2F577a843b1fd2406dbf34cca3805a79b3?format=webp&width=800";
-    three: "https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2F47ccdd39fe5940ff8b5c3a86a6978c66?format=webp&width=800";
-  FAQImg: "https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2F43cc893d38f440c2998892fed2c1bbe2?format=webp&width=800";
-  SiburLogo: string;
-}
 
 interface up{
   name: string,
   password: string,
 }
 
-const Mainpage = ({Image, FAQImg, one, two, three, SiburLogo} : Props) => {
+const Mainpage = () => {
     const router = useRouter()
     const [login_log, setLogin] = useState("");
     const [password_log, setPassword] = useState("");
@@ -62,8 +54,8 @@ const Mainpage = ({Image, FAQImg, one, two, three, SiburLogo} : Props) => {
     })
         .catch(err => {
           console.log(err);
-           if (err.response.data.detail == "User not found"){
-            toast("incorrect an email or a password")}
+           if (err.response.status == 404){
+            console.log("incorrect an email or a password")}
       });
     }
     const scrollToSection = (ref : any) => {
@@ -158,7 +150,7 @@ const Mainpage = ({Image, FAQImg, one, two, three, SiburLogo} : Props) => {
                   <p>GibbSITE</p>
                   <img
                   loading="lazy"
-              src={SiburLogo} className="w-20"/>
+              className="w-20"/>
                   <p>Сириус</p>
               </div>
           </footer>

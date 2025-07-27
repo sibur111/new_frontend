@@ -36,7 +36,7 @@ const Admin = () => {
 
       try {
         const response = await http.get('http://127.0.0.1:8000/auth/verify', {
-          headers: {
+          headers: {      
             Authorization: `Bearer ${token}`,
           },
         });

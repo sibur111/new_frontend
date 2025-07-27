@@ -145,10 +145,6 @@ const AddData = () => {
         source_check: "true",
         molar_mass: mass
     });
-    
-    // Теперь params.toString() даст строку для запроса
-    // Например:
-    // fetch(`your_url?${params.toString()}`)
     console.log(params.toString());
   };
     return (
