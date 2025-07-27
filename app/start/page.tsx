@@ -5,7 +5,6 @@ import Dropdown from '../components/Dropdown'
 import Cookies from "js-cookie";
 import http from "../http-common"
 import { get } from "http";
-import { useSearchParams } from 'next/navigation';
 import Output from '../components/Output'
 const Startpage = () => {
     const router = useRouter();
@@ -37,8 +36,6 @@ const Startpage = () => {
       na_percent: '',
       general: '',
     });
-    const searchParams = useSearchParams();
-    const selected = searchParams.get('target_formula');
     function parseVariantSteps(variantData: any) {
       if (typeof variantData === "string") return [];
       return Object.keys(variantData)
