@@ -209,7 +209,7 @@ const AddData = () => {
     try {
       const token = Cookies.get("token");
       const add_response = await http.post(
-        "http://127.0.0.1:8000/admin/users/",
+        "http://127.0.0.1:8000/admin/materials/",
         {
           id: null,
           formula: target_formula,
