@@ -21,6 +21,7 @@ const Startpage = () => {
     const [ca_percent, setCa] = useState('0.03-0.11');
     const [mg_percent, setMg] = useState('0.005-0.03');
     const [na_percent, setNa] = useState('<0.03');
+    var [inputErr, setInputErr] = useState(false);
     const [serverResponse, setServerResponse] = useState(null);
     const [variants, setVariants] = useState<string[] | null>(null);
     const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
@@ -86,15 +87,19 @@ const Startpage = () => {
         newErrors.result_mass = 'Масса должна быть положительным числом';
         isValid = false;
       }
+      if (!main_percent || Number(main_percent) <= 0 ) {
+        newErrors.result_mass = 'Масса должна быть положительным числом';
+        isValid = false;
+      }
 
       const validatePercent = (value : any, field : any) => {
         if (!value) {
           return `${field} обязателен. Используйте число, диапазон (например, 0.1-0.3) или неравенство (например, <0.015)`;
         }
-        const rangeRegex = /^(\d*\.?\d+)-(\d*\.?\d+)$/;
-        const inequalityRegex = /^(>|<|>=|<=)(\d*\.?\d+)$/;
-        const numberRegex = /^\d*\.?\d+$/;
-        if (
+        const rangeRegex = /^(0\.\d+)-(0\.\d+)$/;
+        const inequalityRegex = /^(>|<|>=|<=)(0\.\d+)$/;
+        const numberRegex = /^0\.\d+$/;
+        if (  
           !rangeRegex.test(value) &&
           !inequalityRegex.test(value) &&
           !numberRegex.test(value)
@@ -104,7 +109,6 @@ const Startpage = () => {
         return '';
       };
 
-      newErrors.main_percent = validatePercent(main_percent, '% содержание чистого вещества');
       newErrors.fe_percent = validatePercent(fe_percent, '% Fe');
       newErrors.si_percent = validatePercent(si_percent, '% Si');
       newErrors.k_percent = validatePercent(k_percent, '% K');
@@ -160,11 +164,15 @@ const Startpage = () => {
         console.log
       }
       catch (err : any ){
-        console.error(err.message);
+        console.log(err);
+        setServerResponse(null);
         setErrors((prev) => ({
           ...prev,
           general: 'Ошибка при отправке данных. Попробуйте снова.',
         }));
+      if (err.response.status == 500 || err.response.status == 400){
+          setInputErr(true);
+      }
       }
     }
 
@@ -275,7 +283,7 @@ return (
         )}
         </div>
 
-        <p className="text-xl text-cyan-50 opacity-70 mt-5">Масса</p>
+        <p className="text-xl text-cyan-50 opacity-70 ">Масса</p>
         <input
           type="text"
           value={result_mass}
@@ -431,6 +439,12 @@ return (
       <button onClick={handleSubmit} className="flex mb-5 justify-center items-center active:shadow-none hover:shadow-lg font-sans mt-10 w-1/4 font-semibold text-2xl mx-auto rounded-lg bg-linear-to-r from-orange-600 to-red-600 text-white opacity-100 p-2">Далее</button>
     </div>
     <div>
+      {inputErr  && (
+        <div className="flex items-center mt-2 justify-center">
+          <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
+          <p className="text-sm text-white  inline">Невозможно вычислить результат для этих данных. Измените данные и попробуйте снова</p>
+        </div>
+      )}
       {serverResponse && (
         <div className="mt-10 mx-40">
           <h3 className="text-xl font-bold mb-3 text-white">

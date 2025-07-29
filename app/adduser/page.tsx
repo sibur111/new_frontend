@@ -12,8 +12,16 @@ const AddUserPage = () => {
     const [pas, setPass] = useState('');
     const [rol, setRol] = useState(null);
     const [usdt, setUsdt] = useState('');
+    const [error, setError] = useState('');
+
     const adduser = async () => {
-        try{
+        // Check if all required fields are filled
+        if (!log.trim() || !pas.trim() || !rol || !usdt.trim()) {
+            setError('Все поля должны быть заполнены');
+            return;
+        }
+
+        try {
             const token = Cookies.get('token'); 
             const add_response = await http.post('http://127.0.0.1:8000/admin/users/', {
                 login : log, 
@@ -24,13 +32,20 @@ const AddUserPage = () => {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
-            })
+            });
+            // Clear form and error on successful submission
+            setLog('');
+            setPass('');
+            setRol(null);
+            setUsdt('');
+            setError('');
         } catch(err : any){
-          console.log(err.message)
+            console.log(err.message);
+            setError('Ошибка при добавлении пользователя');
         }
-      }
+    }
 
-     useEffect(() => {
+    useEffect(() => {
        const verifyToken = async () => {
       const token = Cookies.get('token'); 
 
@@ -66,32 +81,61 @@ const AddUserPage = () => {
   }  
 
     return (
-        <div className="subtitle min-h-screen main bg-white flex items-center justify-center">
-            <div className="">
-                <div>
-                    <p className="ml-20 text-xl text-cyan-50 opacity-70">Логин</p>
-                    <input type="text" value={log} onChange={e => setLog(e.target.value)} className="inp text-cyan-50 opacity-70 rounded-lg ml-20 mb-5"></input>
+        <div className="min-h-screen flex main flex-col items-center justify-center">
+          <div className="flex flex-wrap justify-center">
+              <div className="m-5">
+                <div className="mb-5">
+                    <p className="text-xl text-cyan-50 opacity-70">Логин</p>
+                    <input 
+                        type="text" 
+                        value={log} 
+                        onChange={e => setLog(e.target.value)} 
+                        className="inp text-cyan-50 opacity-70 rounded-lg max-h-60 py-2"
+                    />
                 </div>
                 <div>
-                    <p className="ml-20 text-xl text-cyan-50 opacity-70">Пароль</p>
-                    <input type="text" value={pas} onChange={e => setPass(e.target.value)} className="inp text-cyan-50 opacity-70 rounded-lg ml-20 mb-5"></input>
+                    <p className="text-xl text-cyan-50 opacity-70">Пароль</p>
+                    <input 
+                        type="text" 
+                        value={pas} 
+                        onChange={e => setPass(e.target.value)} 
+                        className="inp text-cyan-50 opacity-70 rounded-lg max-h-60 py-2"
+                    />
                 </div>
             </div>
-            <div className="">
-                <div>
-                    <p className="ml-20 text-xl text-cyan-50 opacity-70">Роль в системе</p>
-                    <DropdownRoles items={["admin", "user"]} defaultText={"Выберите роль"} onSelect={setRol}/>
+            <div className="m-5">
+                <div className="mb-5">
+                    <p className="text-xl text-cyan-50 opacity-70">Роль в системе</p>
+                    <DropdownRoles 
+                        items={["admin", "user"]} 
+                        defaultText={"Выберите роль"} 
+                        onSelect={setRol}
+                    />
                 </div>
                 <div>
-                    <p className="ml-20 text-xl text-cyan-50 opacity-70">ФИО</p>
-                    <input type="text" value={usdt} onChange={e => setUsdt(e.target.value)} className="inp text-cyan-50 opacity-70 rounded-lg ml-20 mb-5"></input>
+                    <p className="text-xl text-cyan-50 opacity-70">ФИО</p>
+                    <input 
+                        type="text" 
+                        value={usdt} 
+                        onChange={e => setUsdt(e.target.value)} 
+                        className="inp text-cyan-50 opacity-70 rounded-lg max-h-60 py-2"
+                    />
                 </div>
             </div>
-            <button onClick={adduser}
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 m-10 hover:bg-gray-300 transition-colors"
-        >
-          Добавить
+          </div>
+          <div className="my-4 flex justify-center">
+            <button 
+                onClick={adduser}
+                className="active:shadow-none hover:shadow-xl font-sans font-semibold text-xl rounded-lg bg-red-600 text-white p-2"
+            >
+                Добавить
             </button>
+          </div>
+          {error && (
+              <div className="text-red-500 text-center mb-4">
+                  {error}
+              </div>
+          )}
         </div>
     )
 }

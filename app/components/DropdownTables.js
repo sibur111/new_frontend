@@ -30,7 +30,7 @@ const Dropdown = ({ items, defaultText, onSelect }) => {
  
   return (<div
     ref={dropdownRef}
-    className="relative inline-block text-cyan-50 opacity-70 w-64"
+    className="relative inline-block text-cyan-50 opacity-70 w-64 m-5"
     tabIndex={0}
   >
     <button

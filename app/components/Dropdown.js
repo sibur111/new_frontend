@@ -8,7 +8,6 @@ const Dropdown = ({ items, defaultText, onSelect }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const dropdownRef = useRef(null);
   const router = useRouter();
-  // Закрытие dropdown при клике вне компонента
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -22,7 +21,6 @@ const Dropdown = ({ items, defaultText, onSelect }) => {
     };
   }, []);
 
-  // Функция для рендеринга LaTeX
   const renderKatex = (text) => {
     return (
       <span
@@ -38,11 +36,10 @@ const Dropdown = ({ items, defaultText, onSelect }) => {
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleItemClick = (item) => {
-    setSelectedItem(item); // Сохраняем строку напрямую
+    setSelectedItem(item); 
     setIsOpen(false);
     if (onSelect) onSelect(item);
-    router.push(`/start?selected=${encodeURIComponent(item)}`);
-  };
+  };     
  
   return (<div
     ref={dropdownRef}
@@ -51,7 +48,7 @@ const Dropdown = ({ items, defaultText, onSelect }) => {
   >
     <button
       onClick={toggleDropdown}
-      className="w-full px-4 py-2 text-left inp border rounded-lg border-teal-900 focus:outline-none focus:ring-1 focus:ring-offset-teal-900"
+      className=" px-4 py-2 text-left inp border rounded-lg border-teal-900 focus:outline-none focus:ring-1 focus:ring-offset-teal-900 w-full"
     >
       {selectedItem ? renderKatex(selectedItem) : defaultText}
       <span className="absolute right-3 top-1/2 transform -translate-y-1/2">

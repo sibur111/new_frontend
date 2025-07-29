@@ -23,7 +23,7 @@ const Dropdown = ({ items, defaultText, onSelect }) => {
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleItemClick = (item) => {
-    setSelectedItem(item); // Сохраняем строку напрямую
+    setSelectedItem(item); 
     setIsOpen(false);
     if (onSelect) onSelect(item);
     router.push(`/adduser?rol=${encodeURIComponent(item)}`);
@@ -31,7 +31,7 @@ const Dropdown = ({ items, defaultText, onSelect }) => {
  
   return (<div
     ref={dropdownRef}
-    className="relative inline-block text-cyan-50 opacity-70 w-64"
+    className="relative inline-block text-cyan-50 w-full"
     tabIndex={0}
   >
     <button
@@ -43,7 +43,7 @@ const Dropdown = ({ items, defaultText, onSelect }) => {
       </span>
     </button>
     {isOpen && (
-      <ul className="absolute z-10 w-full mt-1 inp border rounded-lg border-teal-800 focus:outline-none focus:ring-1 focus:ring-offset-teal-900 max-h-60 overflow-auto">
+      <ul className="absolute z-10 w-full mt-1 inp border rounded-lg border-teal-800 focus:outline-none focus:ring-1 focus:ring-offset-teal-900 overflow-auto">
         {items.length > 0 ? (
           items.map((item, index) => (
             <li

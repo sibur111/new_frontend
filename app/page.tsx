@@ -13,6 +13,7 @@ interface up{
 const Mainpage = () => {
     const router = useRouter()
     const [login_log, setLogin] = useState("");
+    var [notfound, setNotFound] = useState(false);
     const [password_log, setPassword] = useState("");
     const sectionRef1 = useRef(null);
     const sectionRef2 = useRef(null);
@@ -54,8 +55,9 @@ const Mainpage = () => {
     })
         .catch(err => {
           console.log(err);
-           if (err.response.status == 404){
+           if (err.response.status == 404 || err.response.status == 401){
             console.log("incorrect an email or a password")}
+            setNotFound(true);
       });
     }
     const scrollToSection = (ref : any) => {
@@ -145,6 +147,16 @@ const Mainpage = () => {
                   </div>
               </form>
             </section>
+            <div>
+              {notfound && (
+                  <div className="flex items-center mt-2 justify-center">
+                  <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
+                  <p className="text-sm text-white  inline">Неверный логин или пароль</p>
+                </div>
+
+            )}
+            </div>
+            
             <footer>
               <div>
                   <p>GibbSITE</p>
