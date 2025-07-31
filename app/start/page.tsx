@@ -151,7 +151,7 @@ const Startpage = () => {
         const token = Cookies.get('token');
         const queryString = new URLSearchParams(params).toString();
 
-        const response = await fetch(`http://127.0.0.1:8000/chemicals/transformations?${queryString}`, {
+        const response = await fetch(`https://sibur-selection-ghataju.amvera.io/chemicals/transformations?${queryString}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -184,7 +184,7 @@ const Startpage = () => {
         let token = Cookies.get('token');
         if (!token) {
 
-          const r = await http.post('http://127.0.0.1:8000/auth/token', {username: "temp_admin", password: "1234"});
+          const r = await http.post('https://sibur-selection-ghataju.amvera.io/auth/token', {username: "temp_admin", password: "1234"});
           token = r.data.access_token;
           if (token) {
             Cookies.set('token', token);
@@ -201,7 +201,7 @@ const Startpage = () => {
         return;
       }
       try {
-        const response = await http.get('http://127.0.0.1:8000/auth/verify', {
+        const response = await http.get('https://sibur-selection-ghataju.amvera.io/auth/verify', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -224,7 +224,7 @@ const Startpage = () => {
     const fetchItems = async () => {
         try {
           const token = await getToken();
-          const response = await fetch('http://127.0.0.1:8000/chemicals/formulas', {
+          const response = await fetch('https://sibur-selection-ghataju.amvera.io/chemicals/formulas', {
             headers: {
               Authorization: `Bearer ${token}`,
             },

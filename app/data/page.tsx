@@ -54,9 +54,9 @@ const AddData = () => {
   const [sourceCheck, setSourceCheck] = useState('false')
 
   const dict: { [key: string]: string } = {
-    chemicaloperations: "http://127.0.0.1:8000/admin/chemical-operation",
-    chemicalobjects: "http://127.0.0.1:8000/admin/materials",
-    percentchemicalelements: "http://127.0.0.1:8000/admin/chemical-composition",
+    chemicaloperations: "https://sibur-selection-ghataju.amvera.io/admin/chemical-operation",
+    chemicalobjects: "https://sibur-selection-ghataju.amvera.io/admin/materials",
+    percentchemicalelements: "https://sibur-selection-ghataju.amvera.io/admin/chemical-composition",
   };
 
   const massRegex = /^\d*\.?\d*$/;
@@ -94,7 +94,7 @@ const AddData = () => {
   const upload = async (item: string) => {
     try {
       const token = Cookies.get("token");
-      const url = `http://127.0.0.1:8000/admin/table/{table_name}?model_name=${encodeURIComponent(item)}`;
+      const url = `https://sibur-selection-ghataju.amvera.io/admin/table/{table_name}?model_name=${encodeURIComponent(item)}`;
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -161,7 +161,7 @@ const AddData = () => {
     const fetchFormulas = async () => {
       try {
         const token = await getToken();
-        const response = await fetch("http://127.0.0.1:8000/chemicals/formulas", {
+        const response = await fetch("https://sibur-selection-ghataju.amvera.io/chemicals/formulas", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -179,7 +179,7 @@ const AddData = () => {
     const fetchItems = async () => {
       try {
         const token = await getToken();
-        const response = await fetch("http://127.0.0.1:8000/admin/tables", {
+        const response = await fetch("https://sibur-selection-ghataju.amvera.io/admin/tables", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -219,7 +219,7 @@ const AddData = () => {
       const token = Cookies.get("token");
       const trimmedFormula = target_formula.slice(1, -1);
       const add_response = await http.post(
-        "http://127.0.0.1:8000/admin/materials/",
+        "https://sibur-selection-ghataju.amvera.io/admin/materials/",
         {
           id: null,
           formula: trimmedFormula,
@@ -263,7 +263,7 @@ const AddData = () => {
     try {
       const token = Cookies.get("token");
       const add_response = await http.post(
-        "http://127.0.0.1:8000/admin/chemical-composition/",
+        "https://sibur-selection-ghataju.amvera.io/admin/chemical-composition/",
         {
           formula: formula,
           metal_composition: {
@@ -295,7 +295,7 @@ const AddData = () => {
     try {
       const token = Cookies.get("token");
       const add_response = await http.post(
-        "http://127.0.0.1:8000/admin/chemical-operation/",
+        "https://sibur-selection-ghataju.amvera.io/admin/chemical-operation/",
         {
           source : [ source ],
           target : resultFormula,

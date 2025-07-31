@@ -24,7 +24,7 @@ const Mainpage = () => {
     const verifyToken = async () => {
             const token = Cookies.get('token'); 
             try {
-              const responsetoken = await http.get('http://127.0.0.1:8000/auth/verify', {
+              const responsetoken = await http.get('https://sibur-selection-ghataju.amvera.io/api/auth/verify', {
                 headers: {
                   Authorization: `Bearer ${token}`,
                 },

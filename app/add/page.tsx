@@ -54,7 +54,7 @@ const AddUser = () => {
           throw new Error("No token available");
         }
         const response = await fetch(
-          "http://127.0.0.1:8000/admin/table/{table_name}?model_name=userprofile",
+          "https://sibur-selection-ghataju.amvera.io/admin/table/{table_name}?model_name=userprofile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
