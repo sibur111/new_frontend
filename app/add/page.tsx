@@ -10,19 +10,15 @@ interface TableData {
   [key: string]: string | number | null;
 }
 
-interface FetchError {
-  message: string;
-}
-
 interface ServerResponse {
-  columns: string[];
+  columns: string[]; // Убедитесь, что columns — массив строк
   data: TableData[];
   count?: number;
 }
 
 const AddUser = () => {
-  const [data, setData] = useState<TableData[]>([]);
-  const [columns, setColumns] = useState<string[]>([]);
+  const [data, setData] = useState<TableData[]>([]); // Явно указываем тип как массив TableData
+  const [columns, setColumns] = useState<string[]>([]); // Явно указываем тип как массив строк
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -38,9 +34,14 @@ const AddUser = () => {
         if (token) {
           Cookies.set("token", token);
         }
-      } catch (err: FetchError) {
-        console.error("Token fetch error:", err.message);
-        setError("Failed to authenticate: " + err.message);
+      } catch (err: unknown) { // Используем unknown вместо any
+        if (err instanceof Error) {
+          console.error("Token fetch error:", err.message);
+          setError("Failed to authenticate: " + err.message);
+        } else {
+          console.error("Unexpected error:", err);
+          setError("Failed to authenticate: unexpected error");
+        }
       }
     }
     return token;
@@ -54,7 +55,7 @@ const AddUser = () => {
           throw new Error("No token available");
         }
         const response = await fetch(
-          "http://127.0.0.1:8000/admin/table/{table_name}?model_name=userprofile",
+          "https://127.0.0.1:8000/admin/table/{table_name}?model_name=userprofile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -91,9 +92,14 @@ const AddUser = () => {
 
         setColumns(filteredColumns);
         setData(filteredData || []);
-      } catch (err: FetchError) {
-        console.error("Upload error:", err.message);
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Upload error:", err.message);
+          setError(err.message);
+        } else {
+          console.error("Unexpected error:", err);
+          setError("Unexpected error occurred");
+        }
         setColumns([]);
         setData([]);
       }

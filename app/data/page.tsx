@@ -8,14 +8,10 @@ import DynamicTable from "../components/DynamicTable";
 import katex from "katex";
 import Dropdown from "../components/DropdownRoles";
 import DropdownFormulas from "../components/DropdownFormulas"
-// Интерфейсы для типизации
 interface TableData {
   [key: string]: string | number | null;
 }
 
-interface FetchError {
-  message: string;
-}
 
 // Подключаем KaTeX CSS через CDN
 if (typeof window !== "undefined") {
@@ -54,9 +50,9 @@ const AddData = () => {
   const [sourceCheck, setSourceCheck] = useState('false')
 
   const dict: { [key: string]: string } = {
-    chemicaloperations: "http://127.0.0.1:8000/admin/chemical-operation",
-    chemicalobjects: "http://127.0.0.1:8000/admin/materials",
-    percentchemicalelements: "http://127.0.0.1:8000/admin/chemical-composition",
+    chemicaloperations: "https://sibur-selection-ghataju.amvera/admin/chemical-operation",
+    chemicalobjects: "https://sibur-selection-ghataju.amvera/admin/materials",
+    percentchemicalelements: "https://sibur-selection-ghataju.amvera/admin/chemical-composition",
   };
 
   const massRegex = /^\d*\.?\d*$/;
@@ -103,10 +99,10 @@ const AddData = () => {
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
-      const d: { columns: string[]; data: TableData[] } = await response.json();
+      const d: { columns: []; data: [] } = await response.json();
       setColumns(d.columns);
       setData(d.data);
-    } catch (err: FetchError) {
+    } catch (err: any) {
       setError(err.message);
     }
   };
@@ -124,7 +120,7 @@ const AddData = () => {
           if (token) {
             Cookies.set("token", token);
           }
-        } catch (err: FetchError) {
+        } catch (err: any) {
           console.error("Token fetch error:", err.message);
         }
       }
@@ -149,7 +145,7 @@ const AddData = () => {
           Cookies.remove("token");
           router.push("/#");
         }
-      } catch (error: FetchError) {
+      } catch (error: any) {
         console.error("Verification failed:", error.message);
         Cookies.remove("token");
         router.push("/#");
@@ -171,7 +167,7 @@ const AddData = () => {
         }
         const da: string[] = await response.json();
         setFormulas(da);
-      } catch (err: FetchError) {
+      } catch (err: any) {
         console.error(err.message);
       }
     };
@@ -192,7 +188,7 @@ const AddData = () => {
           (table: string) => table !== "userprofile"
         );
         setItems(filteredTables);
-      } catch (err: FetchError) {
+      } catch (err: any) {
         setError(err.message);
       }
     };
@@ -220,7 +216,7 @@ const AddData = () => {
       const trimmedFormula = target_formula.slice(1, -1);
       const add_response = await http.post(
         "http://127.0.0.1:8000/admin/materials/",
-        {
+{
           id: null,
           formula: trimmedFormula,
           source_check: sourceCheck,
@@ -238,7 +234,7 @@ const AddData = () => {
       if (selectedTable === "chemicalobjects") {
         await upload("chemicalobjects");
       }
-    } catch (err: FetchError) {
+    } catch (err: any) {
       console.error("Error adding object:", err.message);
       alert("Ошибка при добавлении объекта: " + err.message);
     }
@@ -286,7 +282,7 @@ const AddData = () => {
       if (selectedTable === "percentchemicalelements") {
         await upload("percentchemicalelements");
       }
-    } catch (err: FetchError) {
+    } catch (err: any) {
       console.error("Error adding object:", err.message);
       alert("Ошибка при добавлении объекта: " + err.message);
     }
@@ -312,7 +308,7 @@ const AddData = () => {
       if (selectedTable === "chemicaloperations") {
         await upload("chemicaloperations");
       }
-    } catch (err: FetchError) {
+    } catch (err: any) {
       console.error("Error adding object:", err.message);
       alert("Ошибка при добавлении объекта: " + err.message);
     }
@@ -326,7 +322,7 @@ const AddData = () => {
       />
       {selectedTable && (
         <div>
-          <DynamicTable headers={columns} data={data} />
+          <DynamicTable  headers={columns} data={data} />
           {selectedTable === "chemicalobjects" && (
             <div className="flex flex-col">
               <div>
