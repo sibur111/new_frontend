@@ -39,6 +39,7 @@ const AddUserPage = () => {
             setRol(null);
             setUsdt('');
             setError('');
+            router.push('/add');
         } catch(err : any){
             console.log(err.message);
             setError('Ошибка при добавлении пользователя');
@@ -132,9 +133,10 @@ const AddUserPage = () => {
             </button>
           </div>
           {error && (
-              <div className="text-red-500 text-center mb-4">
-                  {error}
-              </div>
+              <div className="flex items-center mt-2">
+                  <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
+                  <p className="text-sm text-white  inline">{error}</p>
+                </div>
           )}
         </div>
     )

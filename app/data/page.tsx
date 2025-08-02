@@ -11,7 +11,11 @@ import DropdownFormulas from "../components/DropdownFormulas"
 interface TableData {
   [key: string]: string | number | null;
 }
-
+interface ServerResponse {
+  columns: string[];
+  data: TableData[];
+  count?: number;
+}
 
 // Подключаем KaTeX CSS через CDN
 if (typeof window !== "undefined") {
@@ -48,6 +52,7 @@ const AddData = () => {
   const [temperature, setTemperature] = useState('')
   const [conditions, setConditions] = useState('')
   const [sourceCheck, setSourceCheck] = useState('false')
+  const [chemicalObject, setChemicalObject] = useState<string | null>(null);
 
   const dict: { [key: string]: string } = {
     chemicaloperations: "https://sibur-selection-ghataju.amvera/admin/chemical-operation",
@@ -56,7 +61,14 @@ const AddData = () => {
   };
 
   const massRegex = /^\d*\.?\d*$/;
-
+    const getToken = async (): Promise<string | undefined> => {
+      let token = Cookies.get("token");
+      if (!token) {
+        router.push('/#');
+        return;
+      }
+      return token;
+    };
   const renderLatex = (value: string): string => {
     if (
       typeof value === "string" &&
@@ -87,7 +99,7 @@ const AddData = () => {
     }
   }, [target_formula]);
 
-  const upload = async (item: string) => {
+  const update = async (item: string) => {
     try {
       const token = Cookies.get("token");
       const url = `http://127.0.0.1:8000/admin/table/{table_name}?model_name=${encodeURIComponent(item)}`;
@@ -107,22 +119,56 @@ const AddData = () => {
     }
   };
 
+const upload = async () => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        throw new Error("Токен авторизации отсутствует");
+      }
+      const url = "http://127.0.0.1:8000/admin/table/userprofile?model_name=userprofile";
+      console.log("Fetching data from:", url);
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`Ошибка при загрузке данных: ${response.status} ${response.statusText}`);
+      }
+      const d: ServerResponse = await response.json();
+      console.log("Server response:", d);
+
+      if (!Array.isArray(d.columns) || !Array.isArray(d.data)) {
+        console.error("Некорректный формат ответа сервера:", d);
+        throw new Error("Некорректный формат данных с сервера");
+      }
+
+      const filteredColumns = d.columns.filter(
+        (col: string) => !["hashed_password", "id"].includes(col)
+      );
+      const filteredData = d.data.map((row: TableData) => {
+        const { hashed_password, id, ...rest } = row;
+        return rest;
+      });
+      console.log("Filtered columns:", filteredColumns);
+      console.log("Filtered data:", filteredData);
+
+      setColumns(filteredColumns);
+      setData(filteredData || []);
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.detail || err.message || "Неизвестная ошибка";
+      console.error("Upload error:", errorMessage);
+      setError(`Ошибка при загрузке данных: ${errorMessage}`);
+      setColumns([]);
+      setData([]);
+    }
+  };
   useEffect(() => {
     const getToken = async (): Promise<string | undefined> => {
       let token = Cookies.get("token");
       if (!token) {
-        try {
-          const r = await http.post("/auth/token", {
-            username: "temp_admin",
-            password: "1234",
-          });
-          token = r.data.access_token;
-          if (token) {
-            Cookies.set("token", token);
-          }
-        } catch (err: any) {
-          console.error("Token fetch error:", err.message);
-        }
+        router.push('/#');
+        return;
       }
       return token;
     };
@@ -153,7 +199,7 @@ const AddData = () => {
     };
 
     verifyToken();
-
+    upload();
     const fetchFormulas = async () => {
       try {
         const token = await getToken();
@@ -232,17 +278,41 @@ const AddData = () => {
       setFormula("");
       setSourceCheck("false"); 
       if (selectedTable === "chemicalobjects") {
-        await upload("chemicalobjects");
+        await update("chemicalobjects");
       }
     } catch (err: any) {
       console.error("Error adding object:", err.message);
       alert("Ошибка при добавлении объекта: " + err.message);
     }
 };
+  const deleteObject = async () => {
+    if (!chemicalObject) {
+      alert("Пожалуйста, выберите объект для удаления");
+      return;
+    }
+    try {
+      const token = Cookies.get("token");
+      if (!token) {
+        throw new Error("Токен авторизации отсутствует");
+      }
+      await http.delete(`http://127.0.0.1:8000/admin/chemical/{object_id}`, {
+        headers: {
+          accept: "*/*",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      alert(`Объект ${chemicalObject} успешно удален`);
+      await upload(); // Обновляем таблицу
+      setChemicalObject(null);
+    } catch (err: any) {
+      console.error("Error deleting user:", err.response?.data || err.message);
+      alert("Ошибка при удалении объекта: " + (err.response?.data?.detail || err.message));
+    }
+  }
 
   const handleSelect = (item: string) => {
     setModelName(item);
-    upload(item);
+    update(item);
     setSelectedTable(item);
     setView(false);
   };
@@ -280,7 +350,7 @@ const AddData = () => {
       setMainPercent("");
       setFe("");
       if (selectedTable === "percentchemicalelements") {
-        await upload("percentchemicalelements");
+        await update("percentchemicalelements");
       }
     } catch (err: any) {
       console.error("Error adding object:", err.message);
@@ -306,7 +376,7 @@ const AddData = () => {
       );
       
       if (selectedTable === "chemicaloperations") {
-        await upload("chemicaloperations");
+        await update("chemicaloperations");
       }
     } catch (err: any) {
       console.error("Error adding object:", err.message);
@@ -322,7 +392,7 @@ const AddData = () => {
       />
       {selectedTable && (
         <div>
-          <DynamicTable  headers={columns} data={data} />
+          <DynamicTable  headers={columns} data={data} onRowSelect={setChemicalObject}/>
           {selectedTable === "chemicalobjects" && (
             <div className="flex flex-col">
               <div>
@@ -372,6 +442,18 @@ const AddData = () => {
                     >
                       Добавить
                     </button>
+                    <button
+          onClick={deleteObject}
+          disabled={!chemicalObject} // Отключаем кнопку, если не выбран login
+          className={`active:shadow-none hover:shadow-xl font-sans font-semibold text-xl rounded-lg p-2 px-4 m-2 ${
+            chemicalObject ? 'bg-red-600 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+          }`}
+        >
+          Удалить объект
+        </button>
+        {chemicalObject && (
+        <div className="text-cyan-50 mx-10">Выбран пользователь: {chemicalObject}</div>
+      )}
                   </div>
                 )}
               </div>

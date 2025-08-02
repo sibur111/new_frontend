@@ -183,13 +183,9 @@ const Startpage = () => {
       const getToken = async () => {
         let token = Cookies.get('token');
         if (!token) {
-
-          const r = await http.post('http://127.0.0.1:8000/auth/token', {username: "temp_admin", password: "1234"});
-          token = r.data.access_token;
-          if (token) {
-            Cookies.set('token', token);
-          }
-        }
+        router.push('/#');
+        return;
+      }
         return token;
       };
       

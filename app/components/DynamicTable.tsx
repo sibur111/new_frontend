@@ -4,11 +4,13 @@ import katex from 'katex';
 interface DynamicTableProps {
   headers?: string[]; // Опциональный массив строк
   data?: { [key: string]: any }[]; // Опциональный массив объектов с динамическими ключами
+  onRowSelect?: (login: string) => void;
 }
 
-const DynamicTable: React.FC<DynamicTableProps> = ({ headers = [], data = [] }) => {
+const DynamicTable: React.FC<DynamicTableProps> = ({ headers = [], data = [], onRowSelect }) => {
   const [search, setSearch] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' });
+  const [selectedRow, setSelectedRow] = useState<number | null>(null); // Для отслеживания выбранной строки
 
   // Функция для рендеринга LaTeX
   const renderLatex = (value: any) => {
@@ -58,7 +60,12 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ headers = [], data = [] }) 
       direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc',
     });
   };
-
+const handleRowClick = (row: { [key: string]: string | number | null }, index: number) => {
+    setSelectedRow(index);
+    if (onRowSelect && row.login) {
+      onRowSelect(row.login.toString());
+    }
+  };
   return (
     <div className="overflow-x-auto p-4 min-h-0 max-h-[50vh] overflow-y-auto">
       <input
@@ -87,7 +94,13 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ headers = [], data = [] }) 
         </thead>
         <tbody className="divide-y divide-cyan-900">
           {sortedData.map((row, rowIndex) => (
-            <tr key={rowIndex} className="hover:bg-cyan-950 transition-colors">
+            <tr
+              key={rowIndex}
+              className={`hover:bg-cyan-950 transition-colors ${
+                selectedRow === rowIndex ? 'bg-cyan-800' : ''
+              }`} // Выделяем выбранную строку
+              onClick={() => handleRowClick(row, rowIndex)}
+            >
               {Object.keys(row).map((key, cellIndex) => (
                 <td key={cellIndex} className="px-4 py-2 text-sm text-[#D4F0F2]">
                   {row[key] ?? '-'}
