@@ -166,7 +166,7 @@ const AddData = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        const d: string[] = response.data;
+        const d: string[] = respons.data;
         setOperationFormulas(d);
       } catch (err: any) {
         console.error(err.message);
