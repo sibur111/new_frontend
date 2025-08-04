@@ -24,7 +24,8 @@ if (typeof window !== "undefined") {
 
 const AddData = () => {
   const [items, setItems] = useState<string[]>([]);
-  const [formulas, setFormulas] = useState<string[]>([]);
+  const [percentFormulas, setPercentFormulas] = useState<string[]>([]);
+  const [operationFormulas, setOperationFormulas] = useState<string[]>([]);
   const router = useRouter();
   const [accept, setAccept] = useState<boolean>(false);
   const [model_name, setModelName] = useState<string>("");
@@ -153,13 +154,20 @@ const AddData = () => {
     const fetchFormulas = async () => {
       try {
         const token = await getToken();
-        const response = await http.get("/chemicals/formulas", {
+        const response = await http.get("/chemicals/source", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         const da: string[] = response.data;
-        setFormulas(da);
+        setPercentFormulas(da);
+        const respons = await http.get("/chemicals/all", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const d: string[] = response.data;
+        setOperationFormulas(d);
       } catch (err: any) {
         console.error(err.message);
       }
@@ -398,7 +406,7 @@ const AddData = () => {
                     <div className="w-1/4 mx-5">
                       <label className="block text-white mb-1 mt-5">Формула (LaTeX)</label>
                       <DropdownFormulas
-                        items={formulas}
+                        items={percentFormulas}
                         defaultText="Выберите продукт"
                         onSelect={(item: any) => {
                           setForm(item);
@@ -495,7 +503,7 @@ const AddData = () => {
                       Формула конечного результата
                     </label>
                     <DropdownFormulas
-                      items={formulas}
+                      items={operationFormulas}
                       defaultText="Выберите продукт"
                       onSelect={(item: any) => {
                         setResultFormula(item);
