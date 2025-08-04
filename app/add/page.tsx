@@ -5,13 +5,8 @@ import DynamicTable from "../components/DynamicTable";
 import Cookies from "js-cookie";
 import http from "../http-common";
 
-// Интерфейсы для типизации
 interface TableData {
   [key: string]: string | number | null;
-}
-
-interface FetchError {
-  message: string;
 }
 
 interface ServerResponse {
@@ -38,9 +33,14 @@ const AddUser = () => {
         if (token) {
           Cookies.set("token", token);
         }
-      } catch (err: FetchError) {
-        console.error("Token fetch error:", err.message);
-        setError("Failed to authenticate: " + err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Token fetch error:", err.message);
+          setError("Failed to authenticate: " + err.message);
+        } else {
+          console.error("Unexpected error:", err);
+          setError("Failed to authenticate: unexpected error");
+        }
       }
     }
     return token;
@@ -53,21 +53,17 @@ const AddUser = () => {
         if (!token) {
           throw new Error("No token available");
         }
-        const response = await fetch(
-          "https://sibur-selection-ghataju.amvera.io/admin/table/{table_name}?model_name=userprofile",
+        const response = await http.get(
+          "/admin/table/{table_name}?model_name=userprofile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.statusText}`);
-        }
-        const d: ServerResponse = await response.json();
-        console.log("Server response:", d); // Диагностика ответа
+        const d: ServerResponse = response.data;
+        console.log("Server response:", d);
 
-        // Проверяем, что columns существует и является массивом
         if (!Array.isArray(d.columns)) {
           console.error("No valid columns field in response:", d);
           setError("No valid columns data received from server");
@@ -76,24 +72,27 @@ const AddUser = () => {
           return;
         }
 
-        // Фильтруем столбцы, исключая "hashed_password" и "id"
         const filteredColumns = d.columns.filter(
           (col: string) => !["hashed_password", "id"].includes(col)
         );
-        console.log("Filtered columns:", filteredColumns); // Диагностика результата фильтрации
+        console.log("Filtered columns:", filteredColumns);
 
-        // Фильтруем данные, удаляя "hashed_password" и "id" из каждого объекта
         const filteredData = d.data.map((row: TableData) => {
           const { hashed_password, id, ...rest } = row;
           return rest;
         });
-        console.log("Filtered data:", filteredData); // Диагностика отфильтрованных данных
+        console.log("Filtered data:", filteredData);
 
         setColumns(filteredColumns);
         setData(filteredData || []);
-      } catch (err: FetchError) {
-        console.error("Upload error:", err.message);
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Upload error:", err.message);
+          setError(err.message);
+        } else {
+          console.error("Unexpected error:", err);
+          setError("Unexpected error occurred");
+        }
         setColumns([]);
         setData([]);
       }

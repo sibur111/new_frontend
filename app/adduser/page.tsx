@@ -23,7 +23,7 @@ const AddUserPage = () => {
 
         try {
             const token = Cookies.get('token'); 
-            const add_response = await http.post('https://sibur-selection-ghataju.amvera.io/admin/users/', {
+            const add_response = await http.post('/admin/users/', {
                 login : log, 
                 password : pas, 
                 role : rol, 
@@ -55,7 +55,7 @@ const AddUserPage = () => {
       }
 
       try {
-        const response = await http.get('https://sibur-selection-ghataju.amvera.io/auth/verify', {
+        const response = await http.get('/auth/verify', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

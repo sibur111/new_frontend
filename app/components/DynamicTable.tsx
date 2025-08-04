@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
 import katex from 'katex';
 
-const DynamicTable = ({ headers = [], data = [] }) => {
+interface DynamicTableProps {
+  headers?: string[]; // Опциональный массив строк
+  data?: { [key: string]: any }[]; // Опциональный массив объектов с динамическими ключами
+}
+
+const DynamicTable: React.FC<DynamicTableProps> = ({ headers = [], data = [] }) => {
   const [search, setSearch] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' });
 
   // Функция для рендеринга LaTeX
-  const renderLatex = (value) => {
+  const renderLatex = (value: any) => {
     if (
       typeof value === 'string' &&
       ((value.startsWith('$') && value.endsWith('$')) ||
@@ -47,7 +52,7 @@ const DynamicTable = ({ headers = [], data = [] }) => {
     return aValue < bValue ? 1 : -1;
   });
 
-  const handleSort = (key) => {
+  const handleSort = (key: string) => {
     setSortConfig({
       key,
       direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc',

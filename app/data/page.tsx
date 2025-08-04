@@ -1,3 +1,4 @@
+// new_frontend/app/data/page.tsx
 "use client";
 import { useRouter } from "next/navigation";
 import DropdownTables from "../components/DropdownTables";
@@ -7,14 +8,10 @@ import Cookies from "js-cookie";
 import DynamicTable from "../components/DynamicTable";
 import katex from "katex";
 import Dropdown from "../components/DropdownRoles";
-import DropdownFormulas from "../components/DropdownFormulas"
-// Интерфейсы для типизации
+import DropdownFormulas from "../components/DropdownFormulas";
+
 interface TableData {
   [key: string]: string | number | null;
-}
-
-interface FetchError {
-  message: string;
 }
 
 // Подключаем KaTeX CSS через CDN
@@ -40,23 +37,23 @@ const AddData = () => {
   const [view, setView] = useState<boolean>(false);
   const [formulaPreview, setFormulaPreview] = useState<string>("");
   const [main_percent, setMainPercent] = useState('');
-  const [Fe, setFe] = useState('')
-  const [Si, setSi] = useState('')
-  const [K, setK] = useState('')
-  const [Ca, setCa] = useState('')
-  const [Mg, setMg] = useState('')
-  const [Na, setNa] = useState('')
-  const [formula, setForm] = useState('')
-  const [source, setSource] = useState('')
-  const [resultFormula, setResultFormula] = useState('')
-  const [temperature, setTemperature] = useState('')
-  const [conditions, setConditions] = useState('')
-  const [sourceCheck, setSourceCheck] = useState('false')
+  const [Fe, setFe] = useState('');
+  const [Si, setSi] = useState('');
+  const [K, setK] = useState('');
+  const [Ca, setCa] = useState('');
+  const [Mg, setMg] = useState('');
+  const [Na, setNa] = useState('');
+  const [formula, setForm] = useState('');
+  const [source, setSource] = useState('');
+  const [resultFormula, setResultFormula] = useState('');
+  const [temperature, setTemperature] = useState('');
+  const [conditions, setConditions] = useState('');
+  const [sourceCheck, setSourceCheck] = useState('false');
 
   const dict: { [key: string]: string } = {
-    chemicaloperations: "https://sibur-selection-ghataju.amvera.io/admin/chemical-operation",
-    chemicalobjects: "https://sibur-selection-ghataju.amvera.io/admin/materials",
-    percentchemicalelements: "https://sibur-selection-ghataju.amvera.io/admin/chemical-composition",
+    chemicaloperations: "/admin/chemical-operation",
+    chemicalobjects: "/admin/materials",
+    percentchemicalelements: "/admin/chemical-composition",
   };
 
   const massRegex = /^\d*\.?\d*$/;
@@ -94,19 +91,16 @@ const AddData = () => {
   const upload = async (item: string) => {
     try {
       const token = Cookies.get("token");
-      const url = `https://sibur-selection-ghataju.amvera.io/admin/table/{table_name}?model_name=${encodeURIComponent(item)}`;
-      const response = await fetch(url, {
+      const url = `/admin/table/{table_name}?model_name=${encodeURIComponent(item)}`;
+      const response = await http.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const d: { columns: string[]; data: TableData[] } = await response.json();
+      const d: { columns: []; data: [] } = response.data;
       setColumns(d.columns);
       setData(d.data);
-    } catch (err: FetchError) {
+    } catch (err: any) {
       setError(err.message);
     }
   };
@@ -124,7 +118,7 @@ const AddData = () => {
           if (token) {
             Cookies.set("token", token);
           }
-        } catch (err: FetchError) {
+        } catch (err: any) {
           console.error("Token fetch error:", err.message);
         }
       }
@@ -149,29 +143,24 @@ const AddData = () => {
           Cookies.remove("token");
           router.push("/#");
         }
-      } catch (error: FetchError) {
+      } catch (error: any) {
         console.error("Verification failed:", error.message);
         Cookies.remove("token");
         router.push("/#");
       }
     };
 
-    verifyToken();
-
     const fetchFormulas = async () => {
       try {
         const token = await getToken();
-        const response = await fetch("https://sibur-selection-ghataju.amvera.io/chemicals/formulas", {
+        const response = await http.get("/chemicals/formulas", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const da: string[] = await response.json();
+        const da: string[] = response.data;
         setFormulas(da);
-      } catch (err: FetchError) {
+      } catch (err: any) {
         console.error(err.message);
       }
     };
@@ -179,24 +168,22 @@ const AddData = () => {
     const fetchItems = async () => {
       try {
         const token = await getToken();
-        const response = await fetch("https://sibur-selection-ghataju.amvera.io/admin/tables", {
+        const response = await http.get("/admin/tables", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const data: { tables: string[] } = await response.json();
+        const data: { tables: string[] } = response.data;
         const filteredTables = data.tables.filter(
           (table: string) => table !== "userprofile"
         );
         setItems(filteredTables);
-      } catch (err: FetchError) {
+      } catch (err: any) {
         setError(err.message);
       }
     };
 
+    verifyToken();
     fetchFormulas();
     fetchItems();
   }, [router]);
@@ -219,7 +206,7 @@ const AddData = () => {
       const token = Cookies.get("token");
       const trimmedFormula = target_formula.slice(1, -1);
       const add_response = await http.post(
-        "https://sibur-selection-ghataju.amvera.io/admin/materials/",
+        "/admin/materials/",
         {
           id: null,
           formula: trimmedFormula,
@@ -234,15 +221,15 @@ const AddData = () => {
       );
       setMass("");
       setFormula("");
-      setSourceCheck("false"); 
+      setSourceCheck("false");
       if (selectedTable === "chemicalobjects") {
         await upload("chemicalobjects");
       }
-    } catch (err: FetchError) {
+    } catch (err: any) {
       console.error("Error adding object:", err.message);
       alert("Ошибка при добавлении объекта: " + err.message);
     }
-};
+  };
 
   const handleSelect = (item: string) => {
     setModelName(item);
@@ -259,21 +246,22 @@ const AddData = () => {
   const viewForm = () => {
     setView(!view);
   };
+
   const AddPercentElements = async () => {
     try {
       const token = Cookies.get("token");
       const add_response = await http.post(
-        "https://sibur-selection-ghataju.amvera.io/admin/chemical-composition/",
+        "/admin/chemical-composition/",
         {
           formula: formula,
           metal_composition: {
-            Fe_percent : Fe,
-            Si_percent : Si,
-            K_percent : K,
-            Ca_percent : Ca,
-            Mg_percent : Mg,
-            Na_percent : Na
-          }
+            Fe_percent: Fe,
+            Si_percent: Si,
+            K_percent: K,
+            Ca_percent: Ca,
+            Mg_percent: Mg,
+            Na_percent: Na,
+          },
         },
         {
           headers: {
@@ -286,21 +274,22 @@ const AddData = () => {
       if (selectedTable === "percentchemicalelements") {
         await upload("percentchemicalelements");
       }
-    } catch (err: FetchError) {
+    } catch (err: any) {
       console.error("Error adding object:", err.message);
       alert("Ошибка при добавлении объекта: " + err.message);
     }
-  }
-  const addOperation = async ()  => {
+  };
+
+  const addOperation = async () => {
     try {
       const token = Cookies.get("token");
       const add_response = await http.post(
-        "https://sibur-selection-ghataju.amvera.io/admin/chemical-operation/",
+        "/admin/chemical-operation/",
         {
-          source : [ source ],
-          target : resultFormula,
-          temperature : temperature,
-          conditions : conditions
+          source: [source],
+          target: resultFormula,
+          temperature: temperature,
+          conditions: conditions,
         },
         {
           headers: {
@@ -308,15 +297,15 @@ const AddData = () => {
           },
         }
       );
-      
       if (selectedTable === "chemicaloperations") {
         await upload("chemicaloperations");
       }
-    } catch (err: FetchError) {
+    } catch (err: any) {
       console.error("Error adding object:", err.message);
       alert("Ошибка при добавлении объекта: " + err.message);
     }
-  }
+  };
+
   return (
     <div className="subtitle min-h-screen start">
       <DropdownTables
@@ -332,9 +321,10 @@ const AddData = () => {
               <div>
                 <button
                   onClick={viewForm}
-                  className="act
-                  ive:shadow-none hover:shadow-xl font-sans font-semibold mx-5 text-xl rounded-lg text-white px-3"
-                >+</button>
+                  className="active:shadow-none hover:shadow-xl font-sans font-semibold mx-5 text-xl rounded-lg text-white px-3"
+                >
+                  +
+                </button>
                 {view && (
                   <div className="w-1/4 m-10">
                     <label className="block text-white mb-1">Формула (LaTeX)</label>
@@ -361,15 +351,16 @@ const AddData = () => {
                       type="text"
                       placeholder="Например, 0.01 или 123"
                       className="p-2 rounded border border-cyan-800 text-white w-full"
-                      
                     />
                     <div className="flex justify-start">
-                    <label className="block text-white mt-5">Сырье</label>
-                    <input
-                      type="checkbox"
-                      checked={sourceCheck === "true"}
-                      onChange={(e) => setSourceCheck(e.target.checked ? "true" : "false")} className="p-2 rounded border border-cyan-800 text-white mt-5 mx-5 "/>
-                      </div>
+                      <label className="block text-white mt-5">Сырье</label>
+                      <input
+                        type="checkbox"
+                        checked={sourceCheck === "true"}
+                        onChange={(e) => setSourceCheck(e.target.checked ? "true" : "false")}
+                        className="p-2 rounded border border-cyan-800 text-white mt-5 mx-5"
+                      />
+                    </div>
                     <button
                       onClick={handleSubmit}
                       className="active:shadow-none hover:shadow-xl font-sans font-semibold mt-5 text-xl rounded-lg bg-red-600 text-white p-2"
@@ -384,14 +375,18 @@ const AddData = () => {
           {selectedTable === "percentchemicalelements" && (
             <div>
               <button
-                  onClick={viewForm}
-                  className="active:shadow-none hover:shadow-xl mx-5 font-sans font-semibold text-xl rounded-lg text-white px-3"
-                >+</button>
-                {view && (
-                  <div className="m-10">
-                    <div className=" flex justify-start">
-                      <div className="w-1/4">
-                      <label className="block text-white mb-1 mt-5">Процент чистого вещества</label>
+                onClick={viewForm}
+                className="active:shadow-none hover:shadow-xl mx-5 font-sans font-semibold text-xl rounded-lg text-white px-3"
+              >
+                +
+              </button>
+              {view && (
+                <div className="m-10">
+                  <div className="flex justify-start">
+                    <div className="w-1/4">
+                      <label className="block text-white mb-1 mt-5">
+                        Процент чистого вещества
+                      </label>
                       <input
                         value={main_percent}
                         onChange={(e) => setMainPercent(e.target.value)}
@@ -399,134 +394,146 @@ const AddData = () => {
                         placeholder="Например, 0.01 или 0.015"
                         className="p-2 rounded border border-cyan-800 text-white w-full"
                       />
-                      </div>
-                      <div className="w-1/4 mx-5">
+                    </div>
+                    <div className="w-1/4 mx-5">
                       <label className="block text-white mb-1 mt-5">Формула (LaTeX)</label>
                       <DropdownFormulas
-                        items={formulas} 
-                        defaultText="Выберите продукт" 
-                        onSelect={(item : any) => {
+                        items={formulas}
+                        defaultText="Выберите продукт"
+                        onSelect={(item: any) => {
                           setForm(item);
-                        }} />
-                        </div>
+                        }}
+                      />
                     </div>
-                      <div className="flex justify-start">
-                      <div className="w-1/4"> 
-                        <label className="block text-white mb-1 mt-5">% Fe</label>
-                        <input
-                          value={Fe}
-                          onChange={(e) => setFe(e.target.value)}
-                          type="text"
-                          placeholder="Например, 0.01 или 0.015"
-                          className="p-2 rounded border border-cyan-800 text-white w-full"
-                        />
-                        <label className="block text-white mb-1 mt-5">% Si</label>
-                        <input
-                          value={Si}
-                          onChange={(e) => setSi(e.target.value)}
-                          type="text"
-                          placeholder="Например, 0.01 или 0.015"
-                          className="p-2 rounded border border-cyan-800 text-white w-full"
-                        />
-                        <label className="block text-white mb-1 mt-5">% K</label>
-                        <input
-                          value={K}
-                          onChange={(e) => setK(e.target.value)}
-                          type="text"
-                          placeholder="Например, 0.01 или 0.015"
-                          className="p-2 rounded border border-cyan-800 text-white w-full"
-                        />
-                      </div>
-                        <div className="w-1/4 mx-5">
-                        <label className="block text-white mb-1 mt-5">% Ca</label>
-                        <input
-                          value={Ca}
-                          onChange={(e) => setCa(e.target.value)}
-                          type="text"
-                          placeholder="Например, 0.01 или 0.015"
-                          className="p-2 rounded border border-cyan-800 text-white w-full"
-                        />
-                        <label className="block text-white mb-1 mt-5">% Mg</label>
-                        <input
-                          value={Mg}
-                          onChange={(e) => setMg(e.target.value)}
-                          type="text"
-                          placeholder="Например, 0.01 или 0.015"
-                          className="p-2 rounded border border-cyan-800 text-white w-full"
-                        />
-                        <label className="block text-white mb-1 mt-5">% Na</label>
-                        <input
-                          value={Na}
-                          onChange={(e) => setNa(e.target.value)}
-                          type="text"
-                          placeholder="Например, 0.01 или 0.015"
-                          className="w-full p-2 rounded border border-cyan-800 text-white"
-                        />
-                    </div>
-                    </div>
-                    <button
-                      onClick={AddPercentElements}
-                      className="active:shadow-none hover:shadow-xl font-sans font-semibold mt-5 text-xl rounded-lg bg-red-600 text-white p-2 mb-10"
-                    >
-                      Добавить
-                    </button>
                   </div>
-                )}
+                  <div className="flex justify-start">
+                    <div className="w-1/4">
+                      <label className="block text-white mb-1 mt-5">% Fe</label>
+                      <input
+                        value={Fe}
+                        onChange={(e) => setFe(e.target.value)}
+                        type="text"
+                        placeholder="Например, 0.01 или 0.015"
+                        className="p-2 rounded border border-cyan-800 text-white w-full"
+                      />
+                      <label className="block text-white mb-1 mt-5">% Si</label>
+                      <input
+                        value={Si}
+                        onChange={(e) => setSi(e.target.value)}
+                        type="text"
+                        placeholder="Например, 0.01 или 0.015"
+                        className="p-2 rounded border border-cyan-800 text-white w-full"
+                      />
+                      <label className="block text-white mb-1 mt-5">% K</label>
+                      <input
+                        value={K}
+                        onChange={(e) => setK(e.target.value)}
+                        type="text"
+                        placeholder="Например, 0.01 или 0.015"
+                        className="p-2 rounded border border-cyan-800 text-white w-full"
+                      />
+                    </div>
+                    <div className="w-1/4 mx-5">
+                      <label className="block text-white mb-1 mt-5">% Ca</label>
+                      <input
+                        value={Ca}
+                        onChange={(e) => setCa(e.target.value)}
+                        type="text"
+                        placeholder="Например, 0.01 или 0.015"
+                        className="p-2 rounded border border-cyan-800 text-white w-full"
+                      />
+                      <label className="block text-white mb-1 mt-5">% Mg</label>
+                      <input
+                        value={Mg}
+                        onChange={(e) => setMg(e.target.value)}
+                        type="text"
+                        placeholder="Например, 0.01 или 0.015"
+                        className="p-2 rounded border border-cyan-800 text-white w-full"
+                      />
+                      <label className="block text-white mb-1 mt-5">% Na</label>
+                      <input
+                        value={Na}
+                        onChange={(e) => setNa(e.target.value)}
+                        type="text"
+                        placeholder="Например, 0.01 или 0.015"
+                        className="w-full p-2 rounded border border-cyan-800 text-white"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    onClick={AddPercentElements}
+                    className="active:shadow-none hover:shadow-xl font-sans font-semibold mt-5 text-xl rounded-lg bg-red-600 text-white p-2 mb-10"
+                  >
+                    Добавить
+                  </button>
+                </div>
+              )}
             </div>
           )}
           {selectedTable === "chemicaloperations" && (
             <div className="">
               <button
-                  onClick={viewForm}
-                  className="active:shadow-none hover:shadow-xl mx-5 font-sans font-semibold text-xl rounded-lg text-white px-3"
-                >+</button>
+                onClick={viewForm}
+                className="active:shadow-none hover:shadow-xl mx-5 font-sans font-semibold text-xl rounded-lg text-white px-3"
+              >
+                +
+              </button>
               {view && (
                 <div className="m-10 w-1/4">
-                <div>
-                  <label className="block text-white mb-1 mt-5">id номер исходного сырья</label>
+                  <div>
+                    <label className="block text-white mb-1 mt-5">
+                      id номер исходного сырья
+                    </label>
                     <input
                       value={source}
                       onChange={(e) => setSource(e.target.value)}
                       type="text"
                       placeholder="Целое положительное число"
-                      className="p-2 rounded border border-cyan-800 text-white w-full"/>
-                  <label className="block text-white mb-1 mt-5">Формула конечного результата</label>
+                      className="p-2 rounded border border-cyan-800 text-white w-full"
+                    />
+                    <label className="block text-white mb-1 mt-5">
+                      Формула конечного результата
+                    </label>
                     <DropdownFormulas
-                  items={formulas} 
-                  defaultText="Выберите продукт" 
-                  onSelect={(item : any) => {
-                    setResultFormula(item);
-                  }} />
-                  
-                </div>
-                <div>
-                  <label className="block text-white mb-1 mt-5">Температура</label>
+                      items={formulas}
+                      defaultText="Выберите продукт"
+                      onSelect={(item: any) => {
+                        setResultFormula(item);
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white mb-1 mt-5">Температура</label>
                     <input
                       value={temperature}
                       onChange={(e) => setTemperature(e.target.value)}
                       type="text"
                       placeholder="Целое положительное число"
-                      className="p-2 rounded border border-cyan-800 text-white w-full"/>
-                  <label className="block text-white mb-1 mt-5">Условия реакции</label>
+                      className="p-2 rounded border border-cyan-800 text-white w-full"
+                    />
+                    <label className="block text-white mb-1 mt-5">Условия реакции</label>
                     <input
                       value={conditions}
                       onChange={(e) => setConditions(e.target.value)}
                       type="text"
-                      placeholder="Текст, латинские буквы" 
-                      className="p-2 rounded border border-cyan-800 text-white w-full"/>
+                      placeholder="Текст, латинские буквы"
+                      className="p-2 rounded border border-cyan-800 text-white w-full"
+                    />
+                  </div>
+                  <button
+                    onClick={addOperation}
+                    className="active:shadow-none hover:shadow-xl font-sans font-semibold mt-5 text-xl rounded-lg bg-red-600 text-white p-2 mb-10"
+                  >
+                    Добавить
+                  </button>
                 </div>
-                <button
-                      onClick={addOperation}
-                      className="active:shadow-none hover:shadow-xl font-sans font-semibold mt-5 text-xl rounded-lg bg-red-600 text-white p-2 mb-10"
-                    >
-                      Добавить
-                    </button>
-            </div>
               )}
+            </div>
+          )}
         </div>
       )}
-    </div>)}
-    </div>)
+    </div>
+  );
 };
 
 export default AddData;

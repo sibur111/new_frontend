@@ -20,7 +20,7 @@ const Homepage = () => {
       }
 
       try {
-        const response = await http.get('https://sibur-selection-ghataju.amvera.io/auth/verify', {
+        const response = await http.get('/auth/verify', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
