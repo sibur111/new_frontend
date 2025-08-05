@@ -38,7 +38,7 @@ const Dropdown = ({ items, defaultText, onSelect }) => {
   const handleItemClick = (item) => {
     setSelectedItem(item); 
     setIsOpen(false);
-    if (onSelect) onSelect(item);
+    if (onSelect) onSelect(item); 
   };
  
   return (<div

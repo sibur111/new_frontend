@@ -62,8 +62,13 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ headers = [], data = [], on
   };
 const handleRowClick = (row: { [key: string]: string | number | null }, index: number) => {
     setSelectedRow(index);
-    if (onRowSelect && row.login) {
+    if (onRowSelect && (row.login || row.chemiical_formula)) {
+      if (row.login){
       onRowSelect(row.login.toString());
+      }
+      else if (row.chemical_formula){
+        onRowSelect(row.chemical_formula.toString());
+      }
     }
   };
   return (

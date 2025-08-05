@@ -23,7 +23,7 @@ if (typeof window !== "undefined") {
   link.rel = "stylesheet";
   link.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
   document.head.appendChild(link);
-}
+} 
 
 const AddData = () => {
   const [items, setItems] = useState<string[]>([]);
@@ -53,6 +53,8 @@ const AddData = () => {
   const [conditions, setConditions] = useState('')
   const [sourceCheck, setSourceCheck] = useState('false')
   const [chemicalObject, setChemicalObject] = useState<string | null>(null);
+  const [selectedPercent, setSelectedPercent] = useState<string | null>(null);
+  const [selectedOperation, setSelectedOperation] = useState<string | null>(null);
 
   const dict: { [key: string]: string } = {
     chemicaloperations: "https://sibur-selection-ghataju.amvera/admin/chemical-operation",
@@ -309,7 +311,54 @@ const upload = async () => {
       alert("Ошибка при удалении объекта: " + (err.response?.data?.detail || err.message));
     }
   }
-
+  const deletePercent = async () => {
+    if (!selectedPercent) {
+      alert("Пожалуйста, выберите объект для удаления");
+      return;
+    }
+    try {
+      const token = Cookies.get("token");
+      if (!token) {
+        throw new Error("Токен авторизации отсутствует");
+      }
+      await http.delete(`http://127.0.0.1:8000/admin/chemical-conposition`, {
+        headers: {
+          accept: "*/*",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      alert(`Объект ${selectedPercent} успешно удален`);
+      await upload(); // Обновляем таблицу
+      setChemicalObject(null);
+    } catch (err: any) {
+      console.error("Error deleting user:", err.response?.data || err.message);
+      alert("Ошибка при удалении объекта: " + (err.response?.data?.detail || err.message));
+    }
+  }
+  const deleteOperation = async () => {
+    if (!selectedPercent) {
+      alert("Пожалуйста, выберите объект для удаления");
+      return;
+    }
+    try {
+      const token = Cookies.get("token");
+      if (!token) {
+        throw new Error("Токен авторизации отсутствует");
+      }
+      await http.delete(`http://127.0.0.1:8000/admin/chemical-conposition`, {
+        headers: {
+          accept: "*/*",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      alert(`Объект ${selectedPercent} успешно удален`);
+      await upload(); // Обновляем таблицу
+      setChemicalObject(null);
+    } catch (err: any) {
+      console.error("Error deleting user:", err.response?.data || err.message);
+      alert("Ошибка при удалении объекта: " + (err.response?.data?.detail || err.message));
+    }
+  }
   const handleSelect = (item: string) => {
     setModelName(item);
     update(item);
@@ -392,8 +441,9 @@ const upload = async () => {
       />
       {selectedTable && (
         <div>
-          <DynamicTable  headers={columns} data={data} onRowSelect={setChemicalObject}/>
           {selectedTable === "chemicalobjects" && (
+            <div>
+              <DynamicTable  headers={columns} data={data} onRowSelect={setChemicalObject}/>
             <div className="flex flex-col">
               <div>
                 <button
@@ -452,14 +502,17 @@ const upload = async () => {
           Удалить объект
         </button>
         {chemicalObject && (
-        <div className="text-cyan-50 mx-10">Выбран пользователь: {chemicalObject}</div>
+        <div className="text-cyan-50 mx-10">Выбран объект: {chemicalObject}</div>
       )}
                   </div>
                 )}
               </div>
             </div>
+          </div>
           )}
           {selectedTable === "percentchemicalelements" && (
+            <div>
+              <DynamicTable  headers={columns} data={data} onRowSelect={setSelectedPercent}/>
             <div>
               <button
                   onClick={viewForm}
@@ -548,11 +601,26 @@ const upload = async () => {
                     >
                       Добавить
                     </button>
+                    <button
+          onClick={deleteObject}
+          disabled={!deletePercent} // Отключаем кнопку, если не выбран login
+          className={`active:shadow-none hover:shadow-xl font-sans font-semibold text-xl rounded-lg p-2 px-4 m-2 ${
+            selectedPercent ? 'bg-red-600 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+          }`}
+        >
+          Удалить объект
+        </button>
+        {selectedPercent && (
+        <div className="text-cyan-50 mx-10">Выбран объект: {selectedPercent}</div>
+      )}
                   </div>
                 )}
             </div>
+            </div>
           )}
           {selectedTable === "chemicaloperations" && (
+            <div>
+              <DynamicTable  headers={columns} data={data} onRowSelect={setSelectedOperation}/>
             <div className="">
               <button
                   onClick={viewForm}
@@ -599,8 +667,21 @@ const upload = async () => {
                     >
                       Добавить
                     </button>
+                    <button
+          onClick={deleteObject}
+          disabled={!selectedOperation} // Отключаем кнопку, если не выбран login
+          className={`active:shadow-none hover:shadow-xl font-sans font-semibold text-xl rounded-lg p-2 px-4 m-2 ${
+            selectedOperation ? 'bg-red-600 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+          }`}
+        >
+          Удалить объект
+        </button>
+        {selectedOperation && (
+        <div className="text-cyan-50 mx-10">Выбран объект: {selectedOperation}</div>
+      )}
             </div>
               )}
+        </div>
         </div>
       )}
     </div>)}

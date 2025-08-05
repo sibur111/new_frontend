@@ -102,21 +102,21 @@ const Mainpage = () => {
               <h2 ref={sectionRef2} className="text-5xl font-bold mb-12 text-left">Часто задаваемые вопросы</h2>
               <div className="flex justify-between">
                 <div className="space-y-8">
-                  <div className="flex items-center mb-10">
+                  <div className="flex items-center mb-20">
                     <img
                     loading="lazy"
                     src={"https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2Fd6971021b459450ca4d463e000052a01?format=webp&width=800"} className="w-20"/>
                     <div>
                       <h3 className="text-3xl ml-10 font-bold mb-2">Сколько времени занимает подбор сырья?</h3>
-                      <p className="ml-5 text-2xl w-2/3">В нашем сервисе задействован ИИ, поэтому расчет необходымых сырьевых продуктов происходит почти моментально.</p>
+                      <p className="ml-5 text-2xl w-2/3">Расчет необходымых сырьевых продуктов происходит почти моментально.</p>
                     </div>
                   </div>
-                  <div className="flex items-center mb-10">
+                  <div className="flex items-center mb-20">
                     <img
                     loading="lazy"
                     src={"https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2F577a843b1fd2406dbf34cca3805a79b3?format=webp&width=800"} className="w-20"/>
                     <div>
-                      <h3 className="text-3xl ml-10 font-bold mb-4 w-2/3">Сервис делает расчет стоимость производства носителя?</h3>
+                      <h3 className="text-3xl ml-10 font-bold mb-4 w-2/3">Сервис делает расчет стоимости производства носителя?</h3>
                       <p className="ml-5 text-2xl">Пока нет, но сейчас эта функция в разработке.</p>
                     </div>
                   </div>
@@ -125,8 +125,8 @@ const Mainpage = () => {
                     loading="lazy"
                     src={"https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2F47ccdd39fe5940ff8b5c3a86a6978c66?format=webp&width=800"} className="w-20"/>
                     <div>
-                      <h3 className="text-3xl ml-10 font-bold mb-2"></h3>
-                      <p className="ml-5 text-2xl"></p>
+                      <h3 className="text-3xl ml-10 font-bold mb-2">Что делать, если сервис не нашел подходящее сырье для заданного носителя?</h3>
+                      <p className="ml-5 text-2xl">Попробуйте расширить диапазон в указываемых характеристиках. Также можно обратиться в поддержку для обновления информации о сырье в базу данных</p>
                     </div>
                   </div>
                 </div>
@@ -147,7 +147,7 @@ const Mainpage = () => {
                   </div>
               </form>
             </section>
-            <div>
+            <div className="mb-40">
               {notfound && (
                   <div className="flex items-center mt-2 justify-center">
                   <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
@@ -157,13 +157,13 @@ const Mainpage = () => {
             )}
             </div>
             
-            <footer>
-              <div>
-                  <p>GibbSITE</p>
-                  <img
+            <footer className="pb-20">
+              <div className="flex items-center justify-center">
+                  <img src={'/gibbsite.png'} className="w-1/6 mx-auto"/>
+                  <img src={'/Sibur_logo_RU_RGB.png'}
                   loading="lazy"
-              className="w-20"/>
-                  <p>Сириус</p>
+              className="w-1/6 mx-auto"/>
+                  <img src={'/logo_header.png'} className="w-1/6 mx-auto"/>
               </div>
           </footer>
         </div>
