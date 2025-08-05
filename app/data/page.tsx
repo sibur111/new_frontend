@@ -494,17 +494,17 @@ const upload = async () => {
                       Добавить
                     </button>
                     <button
-          onClick={deleteObject}
-          disabled={!chemicalObject} // Отключаем кнопку, если не выбран login
-          className={`active:shadow-none hover:shadow-xl font-sans font-semibold text-xl rounded-lg p-2 px-4 m-2 ${
-            chemicalObject ? 'bg-red-600 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-          }`}
-        >
-          Удалить объект
-        </button>
-        {chemicalObject && (
-        <div className="text-cyan-50 mx-10">Выбран объект: {chemicalObject}</div>
-      )}
+                      onClick={deleteObject}
+                      disabled={!chemicalObject} // Отключаем кнопку, если не выбран login
+                      className={`active:shadow-none hover:shadow-xl font-sans font-semibold text-xl rounded-lg p-2 px-4 m-2 ${
+                        chemicalObject ? 'bg-red-600 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                      }`}
+                    >
+                      Удалить объект
+                    </button>
+                    {chemicalObject && (
+                    <div className="text-cyan-50 mx-10 mb-20">Выбран объект: {chemicalObject}</div>
+                  )}
                   </div>
                 )}
               </div>

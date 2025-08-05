@@ -18,7 +18,13 @@ html, body, #__next {
 .elements {
   color: #D4F0F2
 }
-
+.auth {
+  background-image: url('/Auth.png');       /* Растягивает на весь экран */
+  font-family: var(--font-jura);
+  background-size:cover;
+  background-repeat: no-repeat; /* Убирает повторение */
+}
+  
 .admin {
   background-image: url('/panel.jpg');
   background-size: cover;       /* Растягивает на весь экран */
