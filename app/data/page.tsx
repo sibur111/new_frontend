@@ -25,6 +25,7 @@ if (typeof window !== "undefined") {
   document.head.appendChild(link);
 } 
 
+
 const AddData = () => {
   const [items, setItems] = useState<string[]>([]);
   const [formulas, setFormulas] = useState<string[]>([]);
@@ -127,7 +128,7 @@ const upload = async () => {
       if (!token) {
         throw new Error("Токен авторизации отсутствует");
       }
-      const url = "http://127.0.0.1:8000/admin/table/userprofile?model_name=userprofile";
+      const url = `http://127.0.0.1:8000/admin/table/userprofile?model_name=${selectedTable}`;
       console.log("Fetching data from:", url);
       const response = await fetch(url, {
         headers: {
@@ -297,7 +298,7 @@ const upload = async () => {
       if (!token) {
         throw new Error("Токен авторизации отсутствует");
       }
-      await http.delete(`http://127.0.0.1:8000/admin/chemical/{object_id}`, {
+      await http.delete(`http://127.0.0.1:8000/admin/chemical/{object_id}?chemical_object=${chemicalObject}`, {
         headers: {
           accept: "*/*",
           Authorization: `Bearer ${token}`,
