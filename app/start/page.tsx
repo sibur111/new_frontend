@@ -14,7 +14,7 @@ const Startpage = () => {
     const [error, setError] = useState(null);
     const [accept, setAccept] = useState(false)
     const [errorinput, seErrorInput] = useState(false);
-    const [target_formula, setSelectedProduct] = useState(null);
+    const [target_formula, setSelectedProduct] = useState<string | null>(null);
     const [result_mass, setMass] = useState('20');
     const [main_percent, setPure] = useState('>98');
     const [fe_percent, setFe] = useState('<0.015');
@@ -249,8 +249,7 @@ const LogOut = () => {
       router.replace('/#')
     }
 return (
-  (accept && <div className="bg-gradient-to-b from-[#006771] to-[#023136] subtitle min-h-screen ">
-    <div className="title">
+    <div className="bg-gradient-to-b from-[#006771] to-[#023136] min-h-screen text-white subtitle">
       <Toaster position="top-right" richColors />
       {/* Header */}
       <div className="pt-5 w-full">
@@ -280,216 +279,283 @@ return (
         </div>        
       </header>
       </div>
-    </div>
-    <p className="text-white text-4xl font-bold mb-10 mt-10 pt-5 ml-40" >Введите данные о носителе</p>
-    <div className="flex ml-40 ">
-      <div>
-        <p className="text-xl text-cyan-50 opacity-70">Формула</p>
-        <Dropdown 
-          items={items} 
-          defaultText="Выберите продукт" 
-          onSelect={(item : any) => {
-            setSelectedProduct(item);
-            setErrors((prev) => ({ ...prev, target_formula: '' }));
-          }} 
-        />
-        <div className="flex justify-between mt-5 items-center space-x-0">
-          {errors.target_formula && (
-          <div className="flex items-center mt-2">
-            <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
-            <p className="text-sm text-white opacity-70 inline">{errors.target_formula}</p>
-          </div>
-        )}
-        </div>
 
-        <p className="text-xl text-cyan-50 opacity-70 ">Масса</p>
-        <input
-          type="text"
-          value={result_mass}
-          onChange={e => {
-            setMass(e.target.value);
-            setErrors((prev) => ({ ...prev, result_mass: '' }));
-          }}
-          className={`text-xl py-2 inp text-cyan-50 opacity-70 mb-5 rounded-lg ${errors.result_mass ? 'border-red-500' : ''}`}
-        />
-        {errors.result_mass && (
-          <div className="flex items-center mt-2">
-            <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
-            <p className="text-sm text-white opacity-70 inline">{errors.result_mass}</p>
-          </div>
-        )}
-
-        <p className="text-xl text-cyan-50 opacity-70">% содержание чистого вещества</p>
-        <input
-          type="text"
-          value={main_percent}
-          onChange={e => {
-            setPure(e.target.value);
-            setErrors((prev) => ({ ...prev, main_percent: '' }));
-          }}
-          className={`text-xl py-2 inp rounded-lg opacity-70 text-cyan-50 mb-5 ${errors.main_percent ? 'border-red-500' : ''}`}
-        />
-        {errors.main_percent && (
-          <div className="flex items-center mt-2">
-            <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
-            <p className="text-sm text-white opacity-70 inline">{errors.main_percent}</p>
-          </div>
-        )}
-      </div>
-      <div>
-        <div className="w-1/2 ml-20 text-xl text-cyan-50 flex ">
-          <div className="mb-5 opacity-70 ">
+      {/* Main Content */}
+      <div className="px-4 sm:px-6 md:px-8 lg:px-10 py-8 max-w-7xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 text-center md:text-left">
+          Введите данные о носителе
+        </h1>
+        <div className="flex flex-col md:flex-row md:items-start md:space-x-8">
+          <div className="flex-1 space-y-4">
             <div>
-              <p className="text-xl">% Fe</p>
-              <input
-                type="text"
-                value={fe_percent}
-                onChange={e => {
-                  setFe(e.target.value);
-                  setErrors((prev) => ({ ...prev, fe_percent: '' }));
+              <p className="text-lg sm:text-xl text-cyan-50 opacity-70 mb-2">Формула</p>
+              <Dropdown
+                items={items}
+                defaultText="Выберите продукт"
+                onSelect={(item: string) => {
+                  setSelectedProduct(item);
+                  setErrors((prev) => ({ ...prev, target_formula: "" }));
                 }}
-                className={`text-xl py-2 inp rounded-lg mr-5 ${errors.fe_percent ? 'border-red-500' : ''}`}
               />
-              {errors.fe_percent && (
+              {errors.target_formula && (
                 <div className="flex items-center mt-2">
-                  <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
-                  <p className="text-sm text-white inline">{errors.fe_percent}</p>
+                  <img
+                    src="/info.png"
+                    alt="Warning"
+                    className="hidden md:block w-5 h-5 mr-2 max-w-full object-contain"
+                  />
+                  <p className="text-sm text-white opacity-70">{errors.target_formula}</p>
                 </div>
               )}
             </div>
             <div>
-              <p className="text-xl mt-5">% Si</p>
+              <p className="text-lg sm:text-xl text-cyan-50 opacity-70 mb-2">Масса</p>
               <input
                 type="text"
-                value={si_percent}
-                onChange={e => {
-                  setSi(e.target.value);
-                  setErrors((prev) => ({ ...prev, si_percent: '' }));
+                value={result_mass}
+                onChange={(e) => {
+                  setMass(e.target.value);
+                  setErrors((prev) => ({ ...prev, result_mass: "" }));
                 }}
-                className={`text-xl py-2 inp rounded-lg mr-5 ${errors.si_percent ? 'border-red-500' : ''}`}
+                className={`w-full text-lg sm:text-xl py-2 px-3 inp rounded-lg bg-white/10 border border-teal-900 focus:ring-1 focus:ring-teal-900 focus:outline-none text-cyan-50 ${errors.result_mass ? "border-red-500" : ""}`}
               />
-              {errors.si_percent && (
+              {errors.result_mass && (
                 <div className="flex items-center mt-2">
-                  <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
-                  <p className="text-sm text- inline">{errors.si_percent}</p>
+                  <img
+                    src="/info.png"
+                    alt="Warning"
+                    className="hidden md:block w-5 h-5 mr-2 max-w-full object-contain"
+                  />
+                  <p className="text-sm text-white opacity-70">{errors.result_mass}</p>
                 </div>
               )}
             </div>
             <div>
-              <p className="text-xl mt-5">% K</p>
+              <p className="text-lg sm:text-xl text-cyan-50 opacity-70 mb-2">% содержание чистого вещества</p>
               <input
                 type="text"
-                value={k_percent}
-                onChange={e => {
-                  setK(e.target.value);
-                  setErrors((prev) => ({ ...prev, k_percent: '' }));
+                value={main_percent}
+                onChange={(e) => {
+                  setPure(e.target.value);
+                  setErrors((prev) => ({ ...prev, main_percent: "" }));
                 }}
-                className={`text-xl py-2 inp rounded-lg mr-5 ${errors.k_percent ? 'border-red-500' : ''}`}
+                className={`w-full text-lg sm:text-xl py-2 px-3 inp rounded-lg bg-white/10 border border-teal-900 focus:ring-1 focus:ring-teal-900 focus:outline-none text-cyan-50 ${errors.main_percent ? "border-red-500" : ""}`}
               />
-              {errors.k_percent && (
+              {errors.main_percent && (
                 <div className="flex items-center mt-2">
-                  <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
-                  <p className="text-sm text-white inline">{errors.k_percent}</p>
+                  <img
+                    src="/info.png"
+                    alt="Warning"
+                    className="hidden md:block w-5 h-5 mr-2 max-w-full object-contain"
+                  />
+                  <p className="text-sm text-white opacity-70">{errors.main_percent}</p>
                 </div>
               )}
             </div>
-          </div>
-          <div className="opacity-70 mx-10">
-            <div>
-              <p className="text-xl">% Ca</p>
-              <input
-                type="text"
-                value={ca_percent}
-                onChange={e => {
-                  setCa(e.target.value);
-                  setErrors((prev) => ({ ...prev, ca_percent: '' }));
-                }}
-                className={`text-xl py-2 inp rounded-lg mr-5 ${errors.ca_percent ? 'border-red-500' : ''}`}
-              />
-              {errors.ca_percent && (
-                <div className="flex items-center mt-2">
-                  <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
-                  <p className="text-sm text-white  inline">{errors.ca_percent}</p>
-                </div>
-              )}
-            </div>
-            <div>
-              <p className="text-xl mt-5">% Mg</p>
-              <input
-                type="text"
-                value={mg_percent}
-                onChange={e => {
-                  setMg(e.target.value);
-                  setErrors((prev) => ({ ...prev, mg_percent: '' }));
-                }}
-                className={`text-xl py-2 inp rounded-lg mr-5 ${errors.mg_percent ? 'border-red-500' : ''}`}
-              />
-              {errors.mg_percent && (
-                <div className="flex items-center mt-2">
-                  <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
-                  <p className="text-sm text-white inline">{errors.mg_percent}</p>
-                </div>
-              )}
-            </div>
-            <div>
-              <p className="text-xl mt-5">% Na</p>
-              <input
-                type="text"
-                value={na_percent}
-                onChange={e => {
-                  setNa(e.target.value);
-                  setErrors((prev) => ({ ...prev, na_percent: '' }));
-                }}
-                className={`text-xl py-2 inp rounded-lg mr-5 ${errors.na_percent ? 'border-red-500' : ''}`}
-              />
-              {errors.na_percent && (
-                <div className="flex items-center mt-2">
-                  <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
-                  <p className="text-sm text-white inline">{errors.na_percent}</p>
-                </div>
-              )}
-            </div>
-          </div>
-          <img src={'/imgstart.png'} className="mx-10 pb-5"/>
-        </div>
-      </div>
-    </div>
-    <div>
-      <button onClick={handleSubmit} className="flex mb-5 justify-center items-center active:shadow-none hover:shadow-lg font-sans mt-10 w-1/4 font-semibold text-2xl mx-auto rounded-lg bg-linear-to-r from-orange-600 to-red-600 text-white opacity-100 p-2">Далее</button>
-    </div>
-    <div>
-      {inputErr  && (
-        <div className="flex items-center mt-2 justify-center">
-          <img src="/info.png" alt="Warning" className="w-6 h-6 mr-2" />
-          <p className="text-sm text-white  inline">Невозможно вычислить результат для этих данных. Измените данные и попробуйте снова</p>
-        </div>
-      )}
-      {serverResponse && (
-        <div className="mt-10 mx-40">
-          <h3 className="text-xl font-bold mb-3 text-white">
-            Варианты: {variants ? variants.map((variant, index) => (
-              <span key={index}>
-                <button
-                  onClick={() => handleVariantClick(variant)}
-                  className={`mr-2 px-3 py-1 rounded ${selectedVariant === variant ? 'text-orange-600' : 'text-white hover:bg-gray-200/10'}`}
-                >
-                  {variant}
-                </button>
-              </span>
-            )) : ''}
-          </h3>
-          {selectedVariant && (
-            <div className="mt-4">
-              <h4 className="text-lg font-semibold mb-2 text-white">Данные для {selectedVariant}:</h4>
-              <div className="text-sm text-white whitespace-pre-wrap overflow-auto p-4 rounded">
-                <Output steps={parseVariantSteps(serverResponse[selectedVariant])} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <p className="text-lg sm:text-xl text-cyan-50 opacity-70 mb-2">% Fe</p>
+                <input
+                  type="text"
+                  value={fe_percent}
+                  onChange={(e) => {
+                    setFe(e.target.value);
+                    setErrors((prev) => ({ ...prev, fe_percent: "" }));
+                  }}
+                  className={`w-full text-lg sm:text-xl py-2 px-3 inp rounded-lg bg-white/10 border border-teal-900 focus:ring-1 focus:ring-teal-900 focus:outline-none text-cyan-50 ${errors.fe_percent ? "border-red-500" : ""}`}
+                />
+                {errors.fe_percent && (
+                  <div className="flex items-center mt-2">
+                    <img
+                      src="/info.png"
+                      alt="Warning"
+                      className="hidden md:block w-5 h-5 mr-2 max-w-full object-contain"
+                    />
+                    <p className="text-sm text-white opacity-70">{errors.fe_percent}</p>
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-lg sm:text-xl text-cyan-50 opacity-70 mb-2">% Si</p>
+                <input
+                  type="text"
+                  value={si_percent}
+                  onChange={(e) => {
+                    setSi(e.target.value);
+                    setErrors((prev) => ({ ...prev, si_percent: "" }));
+                  }}
+                  className={`w-full text-lg sm:text-xl py-2 px-3 inp rounded-lg bg-white/10 border border-teal-900 focus:ring-1 focus:ring-teal-900 focus:outline-none text-cyan-50 ${errors.si_percent ? "border-red-500" : ""}`}
+                />
+                {errors.si_percent && (
+                  <div className="flex items-center mt-2">
+                    <img
+                      src="/info.png"
+                      alt="Warning"
+                      className="hidden md:block w-5 h-5 mr-2 max-w-full object-contain"
+                    />
+                    <p className="text-sm text-white opacity-70">{errors.si_percent}</p>
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-lg sm:text-xl text-cyan-50 opacity-70 mb-2">% K</p>
+                <input
+                  type="text"
+                  value={k_percent}
+                  onChange={(e) => {
+                    setK(e.target.value);
+                    setErrors((prev) => ({ ...prev, k_percent: "" }));
+                  }}
+                  className={`w-full text-lg sm:text-xl py-2 px-3 inp rounded-lg bg-white/10 border border-teal-900 focus:ring-1 focus:ring-teal-900 focus:outline-none text-cyan-50 ${errors.k_percent ? "border-red-500" : ""}`}
+                />
+                {errors.k_percent && (
+                  <div className="flex items-center mt-2">
+                    <img
+                      src="/info.png"
+                      alt="Warning"
+                      className="hidden md:block w-5 h-5 mr-2 max-w-full object-contain"
+                    />
+                    <p className="text-sm text-white opacity-70">{errors.k_percent}</p>
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-lg sm:text-xl text-cyan-50 opacity-70 mb-2">% Ca</p>
+                <input
+                  type="text"
+                  value={ca_percent}
+                  onChange={(e) => {
+                    setCa(e.target.value);
+                    setErrors((prev) => ({ ...prev, ca_percent: "" }));
+                  }}
+                  className={`w-full text-lg sm:text-xl py-2 px-3 inp rounded-lg bg-white/10 border border-teal-900 focus:ring-1 focus:ring-teal-900 focus:outline-none text-cyan-50 ${errors.ca_percent ? "border-red-500" : ""}`}
+                />
+                {errors.ca_percent && (
+                  <div className="flex items-center mt-2">
+                    <img
+                      src="/info.png"
+                      alt="Warning"
+                      className="hidden md:block w-5 h-5 mr-2 max-w-full object-contain"
+                    />
+                    <p className="text-sm text-white opacity-70">{errors.ca_percent}</p>
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-lg sm:text-xl text-cyan-50 opacity-70 mb-2">% Mg</p>
+                <input
+                  type="text"
+                  value={mg_percent}
+                  onChange={(e) => {
+                    setMg(e.target.value);
+                    setErrors((prev) => ({ ...prev, mg_percent: "" }));
+                  }}
+                  className={`w-full text-lg sm:text-xl py-2 px-3 inp rounded-lg bg-white/10 border border-teal-900 focus:ring-1 focus:ring-teal-900 focus:outline-none text-cyan-50 ${errors.mg_percent ? "border-red-500" : ""}`}
+                />
+                {errors.mg_percent && (
+                  <div className="flex items-center mt-2">
+                    <img
+                      src="/info.png"
+                      alt="Warning"
+                      className="hidden md:block w-5 h-5 mr-2 max-w-full object-contain"
+                    />
+                    <p className="text-sm text-white opacity-70">{errors.mg_percent}</p>
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-lg sm:text-xl text-cyan-50 opacity-70 mb-2">% Na</p>
+                <input
+                  type="text"
+                  value={na_percent}
+                  onChange={(e) => {
+                    setNa(e.target.value);
+                    setErrors((prev) => ({ ...prev, na_percent: "" }));
+                  }}
+                  className={`w-full text-lg sm:text-xl py-2 px-3 inp rounded-lg bg-white/10 border border-teal-900 focus:ring-1 focus:ring-teal-900 focus:outline-none text-cyan-50 ${errors.na_percent ? "border-red-500" : ""}`}
+                />
+                {errors.na_percent && (
+                  <div className="flex items-center mt-2">
+                    <img
+                      src="/info.png"
+                      alt="Warning"
+                      className="hidden md:block w-5 h-5 mr-2 max-w-full object-contain"
+                    />
+                    <p className="text-sm text-white opacity-70">{errors.na_percent}</p>
+                  </div>
+                )}
               </div>
             </div>
-          )}
+          </div>
+          <img
+            src="/imgstart.png"
+            className="hidden md:block w-1/3 max-w-xs h-auto object-contain md:ml-8 mt-4 md:mt-0"
+          />
         </div>
-      )}
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={handleSubmit}
+            className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 font-sans font-semibold text-lg sm:text-xl md:text-2xl py-2 px-4 rounded-lg bg-gradient-to-r from-orange-600 to-red-600 text-white hover:shadow-lg active:shadow-none transition-shadow"
+          >
+            Далее
+          </button>
+        </div>
+        {errors.general && (
+          <div className="flex items-center mt-4 justify-center">
+            <img
+              src="/info.png"
+              alt="Warning"
+              className="hidden md:block w-5 h-5 mr-2 max-w-full object-contain"
+            />
+            <p className="text-sm text-white opacity-70">{errors.general}</p>
+          </div>
+        )}
+        {inputErr && (
+          <div className="flex items-center mt-4 justify-center">
+            <img
+              src="/info.png"
+              alt="Warning"
+              className="hidden md:block w-5 h-5 mr-2 max-w-full object-contain"
+            />
+            <p className="text-sm text-white opacity-70">
+              Невозможно вычислить результат для этих данных. Измените данные и попробуйте снова
+            </p>
+          </div>
+        )}
+        {serverResponse && (
+          <div className="mt-8 mx-4 sm:mx-6 md:mx-8 lg:mx-10">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 text-center md:text-left">
+              Варианты:
+            </h3>
+            {variants ? (
+              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                {variants.map((variant, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleVariantClick(variant)}
+                    className={`px-3 py-1 rounded text-sm sm:text-base md:text-lg ${selectedVariant === variant ? "text-orange-600 bg-white/10" : "text-white hover:bg-white/10"} transition-colors`}
+                  >
+                    {variant}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-white opacity-70 text-center">Нет доступных вариантов</p>
+            )}
+            {selectedVariant && (
+              <div className="mt-4">
+                <h4 className="text-base sm:text-lg md:text-xl font-semibold mb-2 text-center md:text-left">
+                  Данные для {selectedVariant}:
+                </h4>
+                <div className="text-sm text-white whitespace-pre-wrap overflow-auto p-4 rounded bg-white/10">
+                  <Output steps={parseVariantSteps(serverResponse[selectedVariant])} />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
-  </div>)
-); 
+  );
 }
 export default Startpage;
