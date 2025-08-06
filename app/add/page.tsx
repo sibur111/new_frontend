@@ -115,6 +115,7 @@ const AddUser = () => {
   return (
     <div className="start subtitle min-h-screen">
       <DynamicTable headers={columns} data={data} onRowSelect={setSelectedLogin}/>
+      <div className="md:flex-row flex-col">
       <button
         onClick={routing}
         className="active:shadow-none hover:shadow-xl font-sans font-semibold text-xl rounded-lg bg-red-500 text-white p-2 px-4 m-10"
@@ -124,7 +125,7 @@ const AddUser = () => {
       <button
           onClick={deleteUser}
           disabled={!selectedLogin} // Отключаем кнопку, если не выбран login
-          className={`active:shadow-none hover:shadow-xl font-sans font-semibold text-xl rounded-lg p-2 px-4 m-2 ${
+          className={`active:shadow-none mx-10 hover:shadow-xl font-sans font-semibold text-xl rounded-lg p-2 px-4 ${
             selectedLogin ? 'bg-red-600 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'
           }`}
         >
@@ -134,6 +135,7 @@ const AddUser = () => {
       {selectedLogin && (
         <div className="text-cyan-50 mx-10">Выбран пользователь: {selectedLogin}</div>
       )}
+    </div>
     </div>
   );
 };
