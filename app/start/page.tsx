@@ -6,6 +6,8 @@ import Cookies from "js-cookie";
 import http from "../http-common"
 import { get } from "http";
 import Output from '../components/Output'
+import { Toaster } from "sonner";
+
 const Startpage = () => {
     const router = useRouter();
     const [items, setItems] = useState([]);
@@ -248,15 +250,36 @@ const LogOut = () => {
     }
 return (
   (accept && <div className="bg-gradient-to-b from-[#006771] to-[#023136] subtitle min-h-screen ">
-    <div className="pt-5 title">
-      <header className="hidden md:flex items-center parent mx-auto px-10 py-1 w-full text-sm text-white bg-cyan-900 max-w-[1026px] rounded-2xl md:rounded-full max-md:px-5 max-md:max-w-full">
-        <a href="/#">
-          <img src={'/gibbsite.png'} className="h-5 m-2" />
-        </a>
-        <nav className="ml-auto items-center p-2">
-          <a href="#" onClick={LogOut} className="font-sans font-semibold hover:text-orange-600 transition-colors duration-200">Выйти</a>
-        </nav>
+    <div className="title">
+      <Toaster position="top-right" richColors />
+      {/* Header */}
+      <div className="pt-5 w-full">
+      <header className="rounded-3xl mx-10 px-4 py-2 bg-cyan-900 title">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <a href="/#">
+            <img src="/gibbsite.png" alt="Logo" className="h-8 md:h-10 p-2" />
+          </a>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex space-x-6 items-center">
+            
+            <a
+              href="#"
+              onClick={LogOut}
+              className="font-semibold text-sm md:text-base hover:text-orange-600 transition-colors text-[#D4F0F2]"
+            >
+              Выйти
+            </a>
+          </nav>
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden text-white focus:outline-none"
+            onClick={LogOut}
+            aria-label="Toggle menu"
+          >Выйти
+          </button>
+        </div>        
       </header>
+      </div>
     </div>
     <p className="text-white text-4xl font-bold mb-10 mt-10 pt-5 ml-40" >Введите данные о носителе</p>
     <div className="flex ml-40 ">

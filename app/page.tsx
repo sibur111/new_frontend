@@ -19,6 +19,8 @@ const Mainpage = () => {
   const sectionRef1 = useRef<HTMLElement | null>(null);
   const sectionRef2 = useRef<HTMLElement | null>(null);
   const sectionRef3 = useRef<HTMLElement | null>(null);
+  const [admin, setAdmin] = useState(false);
+  const [user, setUser] = useState(false);
 
   const verifyToken = async () => {
     const token = Cookies.get("token");
@@ -29,11 +31,15 @@ const Mainpage = () => {
         },
       });
       toast("Успешный вход");
-      if (responsetoken.data.role === "user") {
-        router.push("/home");
-      } else {
-        router.push("/admin");
+      if (responsetoken.data.is_valid == true ){
+        if (responsetoken.data.role === "user") {
+        setUser(true);
+      } 
+      else if (responsetoken.data.role === "admin"){
+        setAdmin(true);
       }
+      }
+      
     } catch (error: any) {
       console.error("Verification failed:", error.message);
       Cookies.remove("token");
@@ -50,6 +56,12 @@ const Mainpage = () => {
       Cookies.set("token", response.data.access_token, { expires: 7 });
       console.log("Login response:", response.data);
       await verifyToken();
+      if (admin){
+        router.push('/admin')
+      }
+      else if (user){
+        router.push('/home')
+      }
     } catch (err: any) {
       console.error("Login error:", err);
       if (err.response?.status === 404 || err.response?.status === 401) {
@@ -161,7 +173,7 @@ const Mainpage = () => {
 
       {/* Hero Section */}
       <section
-        className="bg-[url('https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2F689deeb4666c4067bc7611d0e0e6506a?format=webp&width=800')] bg-no-repeat bg-center mt-8 md:mt-40 py-12 px-4 flex flex-col items-center"
+        className="bg-[url('https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2F689deeb4666c4067bc7611d0e0e6506a?format=webp&width=800')] bg-no-repeat bg-contain bg-center mt-8 md:mt-40 py-12 px-4 flex flex-col items-center"
       >
         <img src="/gibbsite.png" alt="Gibbsite" className="h-12 md:h-16 mb-6" />
         <div className="text-center">
@@ -183,10 +195,10 @@ const Mainpage = () => {
           className="md:w-2/3 w-[40%] max-w-md mb-6 md:mb-0 md:mr-8"
         />
         <div className="mx-10 text-left">
-          <h2 className="text-2xl md:text-4xl font-semibold text-orange-600 mb-4">
+          <h2 className="text-4xl md:text-4xl font-semibold text-orange-600 mb-4">
             Как это работает?
           </h2>
-          <p className="text-lg md:text-2xl">
+          <p className="text-2xl md:text-2xl">
             Вы вводите данные о требуемом носителе, а мы автоматически подбираем сырье и условия
             приготовления.
           </p>
@@ -195,7 +207,7 @@ const Mainpage = () => {
 
       {/* FAQ Section */}
       <section ref={sectionRef2} className="py-8 px-4 md:px-8 md:max-w-3/4 mx-auto md:mt-40">
-        <h2 className="text-2xl md:text-4xl font-bold mb-8 text-center md:text-left">
+        <h2 className="text-4xl md:text-4xl font-bold mb-8 text-center md:text-left">
           Часто задаваемые вопросы
         </h2>
         <div className="flex md:flex-row md:items-center justify-between">
@@ -305,16 +317,16 @@ const Mainpage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 md:mt-40">
+      <footer className="py-8 px-4 md:mt-40 ">
         <div className="flex flex-col md:mx-auto sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8">
-          <img src="/gibbsite.png" alt="Gibbsite" className="h-12 md:w-1/7 object-contain" />
+          <img src="/gibbsite.png" alt="Gibbsite" className="h-12 w-1/7 object-contain" />
           <img
             src="/Sibur_logo_RU_RGB.png"
             alt="Sibur"
             loading="lazy"
-            className="h-12 md:w-1/6 object-contain"
+            className="h-12 w-1/6 object-contain"
           />
-          <img src="/logo_header.png" alt="Logo" className="h-12 md:w-1/6 object-contain" />
+          <img src="/logo_header.png" alt="Logo" className="h-12 w-1/6 object-contain" />
         </div>
       </footer>
     </div>
