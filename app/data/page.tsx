@@ -20,6 +20,7 @@ interface ServerResponse {
   count?: number;
 }
 interface PercentData {
+  composition_id : number,
   chemical_id: number;
   main_percent: number;
   Fe_percent: number;
@@ -332,11 +333,21 @@ const upload = async () => {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      data: selectedPercent,
+      data: {
+        chemical_id : Number(selectedPercent.chemical_id),
+        main_percent : Number(selectedPercent.main_percent),
+        Fe_percent : Number(selectedPercent.Fe_percent),
+        Si_percent : Number(selectedPercent.Si_percent),
+        K_percent : Number(selectedPercent.K_percent),
+        Ca_percent : Number(selectedPercent.Ca_percent),
+        Mg_percent : Number(selectedPercent.Mg_percent),
+        Na_percent : Number(selectedPercent.Na_percent)
+      },
     });
     setData(data.filter((item) => item.type_id !== selectedPercent.chemical_id));
     setSelectedPercent(null);
     setError(null);
+    alert(`Объект ${selectedPercent.composition_id} успешно удален`);
   } catch (err: any) {
     setError("Ошибка при удалении состава: " + (err.response?.data?.detail || err.message));
     console.error("Delete composition error:", err);
@@ -534,11 +545,11 @@ const upload = async () => {
                   onClick={viewForm}
                   className="active:shadow-none hover:shadow-xl mx-5 font-sans font-semibold text-xl rounded-lg text-white px-3"
                 >+</button>
-                {selectedPercent && (<div className="text-cyan-50 mt-4 mx-10">
-                          Выбран состав: <br />
-                          ID: {selectedPercent.chemical_id} <br />
-                        </div>
-      )}
+                {selectedPercent && (
+  <div className="text-cyan-50 mt-4 mx-10">
+    Выбран состав: ID : {selectedPercent.composition_id}
+  </div>
+)}
                 {view && (
                   <div className="m-10">
                     <div className=" flex justify-start">

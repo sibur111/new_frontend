@@ -75,6 +75,7 @@ const DynamicTablePercent: React.FC<DynamicTableProps> = ({ headers = [], data =
     setSelectedRow(rowIndex);
     if (onRowSelect) {
       const selectedData: TableData = {
+        composition_id : typeof row.id === "number" ? row.id : parseInt(row.id as string) || 0,
         chemical_id: typeof row.type_id === "number" ? row.type_id : parseFloat(row.type_id as string) || 0,
         main_percent: typeof row.main_percent === "number" ? row.main_percent : parseFloat(row.main_percent as string) || 0,
         Fe_percent: typeof row.Fe_percent === "number" ? row.Fe_percent : parseFloat(row.Fe_percent as string) || 0,

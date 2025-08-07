@@ -30,15 +30,14 @@ const Mainpage = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      toast("Успешный вход");
-      if (responsetoken.data.is_valid == true ){
-        if (responsetoken.data.role === "user") {
-        setUser(true);
-      } 
-      else if (responsetoken.data.role === "admin"){
-        setAdmin(true);
-      }
-      }
+      if (responsetoken.data.role == "user"){
+                toast("successful login")
+                router.push("/home");
+              }
+              else{
+                toast("successful login")
+                router.push("/admin");
+              }
       
     } catch (error: any) {
       console.error("Verification failed:", error.message);
@@ -47,29 +46,29 @@ const Mainpage = () => {
   };
 
   const upload = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await http.post("/auth/login", {
-        username: login_log,
-        password: password_log,
-      });
-      Cookies.set("token", response.data.access_token, { expires: 7 });
-      console.log("Login response:", response.data);
-      await verifyToken();
-      if (admin){
-        router.push('/admin')
-      }
-      else if (user){
-        router.push('/home')
-      }
-    } catch (err: any) {
-      console.error("Login error:", err);
-      if (err.response?.status === 404 || err.response?.status === 401) {
-        setNotFound(true);
-      }
+    if (login_log == "" || password_log == ""){
+      alert("Все поля должны быть заполнены")
     }
+    else{
+      e.preventDefault()
+      http.post("/auth/login", { username: login_log, password: password_log} )
+        .then(response => {
+          Cookies.set('token', response.data.access_token, { expires: 7 })
+          if (response.data){
+            console.log(response.data)
+            verifyToken();
+          }
+            
+    })
+        .catch(err => {
+          console.log(err);
+           if (err.response.status == 404 || err.response.status == 401){
+            console.log("incorrect an email or a password")}
+            setNotFound(true);
+      });
+    
   };
-
+  }
   const scrollToSection = (ref: React.RefObject<HTMLElement | null>) => {
     if (ref.current) {
       ref.current.scrollIntoView({
@@ -192,13 +191,13 @@ const Mainpage = () => {
           loading="lazy"
           src="https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2F797b43e33b054d31870a53751f6e3a2e?format=webp&width=800"
           alt="Illustration"
-          className="md:w-2/3 w-[40%] max-w-md mb-6 md:mb-0 md:mr-8"
+          className="md:w-2/3 w-[40%] max-w-md mb-6 md:mb-0 md:mr-8 ml-10"
         />
         <div className="mx-10 text-left">
-          <h2 className="text-4xl md:text-4xl font-semibold text-orange-600 mb-4">
+          <h2 className="text-4xl md:text-6xl font-semibold text-orange-600 mb-4">
             Как это работает?
           </h2>
-          <p className="text-2xl md:text-2xl">
+          <p className="text-2xl md:text-3xl">
             Вы вводите данные о требуемом носителе, а мы автоматически подбираем сырье и условия
             приготовления.
           </p>
@@ -220,7 +219,7 @@ const Mainpage = () => {
                 className="w-12 h-12 mb-4 sm:mb-0 sm:mr-4"
               />
               <div>
-                <h3 className="text-lg md:text-xl font-bold mb-2">
+                <h3 className="text-lg md:text-2xl font-bold mb-2">
                   Сколько времени занимает подбор сырья?
                 </h3>
                 <p className="text-base md:text-lg">
@@ -236,7 +235,7 @@ const Mainpage = () => {
                 className="w-12 h-12 mb-4 sm:mb-0 sm:mr-4"
               />
               <div>
-                <h3 className="text-lg md:text-xl font-bold mb-2">
+                <h3 className="text-lg md:text-2xl font-bold mb-2">
                   Сервис делает расчет стоимости производства носителя?
                 </h3>
                 <p className="text-base md:text-lg">
@@ -252,7 +251,7 @@ const Mainpage = () => {
                 className="w-12 h-12 mb-4 sm:mb-0 sm:mr-4"
               />
               <div>
-                <h3 className="text-lg md:text-xl font-bold mb-2">
+                <h3 className="text-lg md:text-2xl font-bold mb-2">
                   Что делать, если сервис не нашел подходящее сырье?
                 </h3>
                 <p className="text-base md:text-lg">
@@ -276,7 +275,6 @@ const Mainpage = () => {
         className="py-8 px-4 flex justify-center md:mt-40"
       >
         <form
-          onSubmit={upload}
           className="w-full max-w-md bg-white p-6 rounded-3xl shadow-lg "
         >
           <h2 className="text-2xl md:text-3xl font-bold text-orange-600 mb-6 title text-left">

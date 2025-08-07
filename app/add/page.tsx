@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import DynamicTable from "../components/DynamicTable";
+import DynamicTableUsers from "../components/DynamicTableUsers";
 import Cookies from "js-cookie";
 import http from "../http-common";
 
@@ -114,7 +114,7 @@ const AddUser = () => {
 
   return (
     <div className="start subtitle min-h-screen">
-      <DynamicTable headers={columns} data={data} onRowSelect={setSelectedLogin}/>
+      <DynamicTableUsers headers={columns} data={data} onRowSelect={setSelectedLogin}/>
       <div className="md:flex-row flex-col">
       <button
         onClick={routing}

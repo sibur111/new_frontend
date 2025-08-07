@@ -6,33 +6,33 @@ interface TableData {
 }
 
 interface DynamicTableProps {
-  headers: string[];
-  data: TableData[];
-  onRowSelect?: ((value: string | null) => void) | ((data: TableData) => void);
+  headers?: string[]; // Опциональный массив строк
+  data?: { [key: string]: any }[]; // Опциональный массив объектов с динамическими ключами
+  onRowSelect?: (login: string) => void;
 }
 
-const DynamicTable: React.FC<DynamicTableProps> = ({ headers = [], data = [], onRowSelect }) => {
-  const [search, setSearch] = useState("");
-  const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: "asc" | "desc" }>({ key: null, direction: "asc" });
-  const [selectedRow, setSelectedRow] = useState<number | null>(null);
+const DynamicTableUsers: React.FC<DynamicTableProps> = ({ headers = [], data = [], onRowSelect }) => {
+   const [search, setSearch] = useState('');
+  const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' });
+  const [selectedRow, setSelectedRow] = useState<number | null>(null); // Для отслеживания выбранной строки
 
   // Функция для рендеринга LaTeX
   const renderLatex = (value: any) => {
     if (
-      typeof value === "string" &&
-      ((value.startsWith("$") && value.endsWith("$")) ||
-        (value.startsWith("\\(") && value.endsWith("\\)")))
+      typeof value === 'string' &&
+      ((value.startsWith('$') && value.endsWith('$')) ||
+        (value.startsWith('\\(') && value.endsWith('\\)')))
     ) {
       try {
         const latexContent = value
-          .replace(/^\$|\$$/g, "")
-          .replace(/^\\\(|\)\)$/g, "");
+          .replace(/^\$|\$$/g, '')
+          .replace(/^\\\(|\)\)$/g, '');
         return katex.renderToString(latexContent, {
           displayMode: false,
           throwOnError: false,
         });
       } catch (error) {
-        console.error("KaTeX rendering error:", error);
+        console.error('KaTeX rendering error:', error);
         return value;
       }
     }
@@ -45,22 +45,14 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ headers = [], data = [], on
       value?.toString().toLowerCase().includes(search.toLowerCase())
     )
   );
-
   // Сортировка данных
   const sortedData = [...filteredData].sort((a, b) => {
     if (!sortConfig.key) return 0;
     const aValue = a[sortConfig.key];
     const bValue = b[sortConfig.key];
-
-    if (aValue === undefined || aValue === null) {
-      return bValue === undefined || bValue === null ? 0 : 1;
-    }
-    if (bValue === undefined || bValue === null) {
-      return -1;
-    }
-
-    if (sortConfig.direction === "asc") {
-      return aValue > bValue ? 1 : -1;
+    if (aValue === undefined || bValue === undefined) return 0;
+    if (sortConfig.direction === 'asc') {
+           return aValue > bValue ? 1 : -1;
     }
     return aValue < bValue ? 1 : -1;
   });
@@ -68,7 +60,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ headers = [], data = [], on
   const handleSort = (key: string) => {
     setSortConfig({
       key,
-      direction: sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc",
+      direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc',
     });
   };
 
@@ -79,26 +71,21 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ headers = [], data = [], on
     return handler.length === 1;
   };
 
-  const handleRowClick = (row: TableData, index: number) => {
+  const handleRowClick = (row: { [key: string]: string | number | null }, index: number) => {
     setSelectedRow(index);
-    if (onRowSelect) {
-      if (isStringHandler(onRowSelect)) {
-        // Для chemicalobjects и percentchemicalelements
-        if ("chemical_formula" in row) {
-          const value = typeof row.chemical_formula === "number" 
-            ? row.chemical_formula.toString() 
-            : row.chemical_formula;
-          onRowSelect(value as string | null);
-        } else if ("main_percent" in row) {
-          const value = typeof row.main_percent === "number" 
-            ? row.main_percent.toString() 
-            : row.main_percent;
-          onRowSelect(value as string | null);
-        }
-      } else {
-        // Для chemicaloperations
-        onRowSelect(row);
+    if (onRowSelect && (row.login || row.chemical_formula || row.main_percent || row.source_ids)) {
+      if (row.login){
+      onRowSelect(row.login.toString());
       }
+      else if (row.chemical_formula){
+        onRowSelect(row.chemical_formula.toString());
+      }
+      else if (row.main_percent) {
+        onRowSelect(row.main_percent.toString());
+      }
+      else if (row.source_ids) {
+        onRowSelect(row.source_ids.toString());
+        }
     }
   };
 
@@ -150,4 +137,4 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ headers = [], data = [], on
   );
 };
 
-export default DynamicTable;
+export default DynamicTableUsers;
