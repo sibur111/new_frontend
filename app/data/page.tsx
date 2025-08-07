@@ -55,13 +55,7 @@ const AddData = () => {
   const [sourceCheck, setSourceCheck] = useState('false')
   const [chemicalObject, setChemicalObject] = useState<string | null>(null);
   const [selectedPercent, setSelectedPercent] = useState<string | null>(null);
-  const [selectedOperation, setSelectedOperation] = useState<string | null>(null);
-
-  const dict: { [key: string]: string } = {
-    chemicaloperations: "https://sibur-selection-ghataju.amvera/admin/chemical-operation",
-    chemicalobjects: "https://sibur-selection-ghataju.amvera/admin/materials",
-    percentchemicalelements: "https://sibur-selection-ghataju.amvera/admin/chemical-composition",
-  };
+  const [selectedOperation, setSelectedOperation] = useState<{ source_id: string; target_id: string } | null>(null);
 
   const massRegex = /^\d*\.?\d*$/;
     const getToken = async (): Promise<string | undefined> => {
@@ -337,29 +331,34 @@ const upload = async () => {
     }
   }
   const deleteOperation = async () => {
-    if (!selectedPercent) {
-      alert("Пожалуйста, выберите объект для удаления");
+    if (!selectedOperation?.source_id || !selectedOperation?.target_id) {
+      setError("Не выбраны source_id или target_id");
       return;
     }
     try {
-      const token = Cookies.get("token");
-      if (!token) {
-        throw new Error("Токен авторизации отсутствует");
-      }
-      await http.delete(`http://127.0.0.1:8000/admin/chemical-conposition`, {
+      const token = await getToken();
+      if (!token) return;
+      await http.delete(`http://127.0.0.1:8000/admin/chemical-operation`, {
         headers: {
-          accept: "*/*",
           Authorization: `Bearer ${token}`,
+          accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        data: {
+          target_id: Number(selectedOperation.target_id),
+          source_id: Number(selectedOperation.source_id),
         },
       });
-      alert(`Объект ${selectedPercent} успешно удален`);
-      await upload(); // Обновляем таблицу
-      setChemicalObject(null);
+      setData(data.filter((item) => item.source_ids !== selectedOperation.source_id));
+      setSelectedOperation(null);
+      setError(null);
+      alert(`Объект source_id:${Number(selectedOperation.source_id)}, tarhet_id:${Number(selectedOperation.target_id)} успешно удален`);
+      await upload();
     } catch (err: any) {
-      console.error("Error deleting user:", err.response?.data || err.message);
-      alert("Ошибка при удалении объекта: " + (err.response?.data?.detail || err.message));
+      setError("Ошибка при удалении операции");
+      console.error("Delete operation error:", err);
     }
-  }
+  };
   const handleSelect = (item: string) => {
     setModelName(item);
     update(item);
@@ -621,7 +620,11 @@ const upload = async () => {
           )}
           {selectedTable === "chemicaloperations" && (
             <div>
-              <DynamicTable  headers={columns} data={data} onRowSelect={setSelectedOperation}/>
+              <DynamicTable
+                  headers={columns}
+                  data={data}
+                  onRowSelect={(data) => setSelectedOperation(data as { source_id: string; target_id: string })}
+                />
             <div className="">
               <button
                   onClick={viewForm}
@@ -669,7 +672,7 @@ const upload = async () => {
                       Добавить
                     </button>
                     <button
-          onClick={deleteObject}
+          onClick={deleteOperation}
           disabled={!selectedOperation} // Отключаем кнопку, если не выбран login
           className={`active:shadow-none hover:shadow-xl font-sans font-semibold text-xl rounded-lg p-2 px-4 m-2 ${
             selectedOperation ? 'bg-red-600 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'
@@ -678,7 +681,9 @@ const upload = async () => {
           Удалить объект
         </button>
         {selectedOperation && (
-        <div className="text-cyan-50 mx-10">Выбран объект: {selectedOperation}</div>
+        <div className="text-cyan-50 mx-10">
+  Выбран объект: source_id: {selectedOperation.source_id}, target_id: {selectedOperation.target_id || "Не указан"}
+</div>
       )}
             </div>
               )}
