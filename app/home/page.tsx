@@ -21,7 +21,7 @@ const Homepage = () => {
       }
 
       try {
-        const response = await http.get('http://127.0.0.1:8000/auth/verify', {
+        const response = await http.get('/auth/verify', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

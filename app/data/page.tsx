@@ -1,3 +1,4 @@
+// new_frontend/app/data/page.tsx
 "use client";
 import { useRouter } from "next/navigation";
 import DropdownTables from "../components/DropdownTables";
@@ -10,7 +11,7 @@ import Dropdown from "../components/DropdownRoles";
 import DropdownFormulas from "../components/DropdownFormulas"
 import DynamicTableOperations from "../components/DynamicTableOperations";
 import DynamicTablePercent from "../components/DynamicTablePercent";
-
+// Интерфейсы для типизации
 interface TableData {
   [key: string]: string | number | null;
 }
@@ -41,7 +42,8 @@ if (typeof window !== "undefined") {
 
 const AddData = () => {
   const [items, setItems] = useState<string[]>([]);
-  const [formulas, setFormulas] = useState<string[]>([]);
+  const [percentFormulas, setPercentFormulas] = useState<string[]>([]);
+  const [operationFormulas, setOperationFormulas] = useState<string[]>([]);
   const router = useRouter();
   const [accept, setAccept] = useState<boolean>(false);
   const [model_name, setModelName] = useState<string>("");
@@ -112,16 +114,16 @@ const AddData = () => {
   const update = async (item: string) => {
     try {
       const token = Cookies.get("token");
-      const url = `http://127.0.0.1:8000/admin/table/{table_name}?model_name=${encodeURIComponent(item)}`;
-      const response = await fetch(url, {
+      const url = `admin/table/{table_name}?model_name=${encodeURIComponent(item)}`;
+const response = await http.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) {
+      if (!response) {
         throw new Error("Failed to fetch data");
       }
-      const d: { columns: []; data: [] } = await response.json();
+      const d: { columns: []; data: [] } = await response.data;
       setColumns(d.columns);
       setData(d.data);
     } catch (err: any) {
@@ -135,17 +137,15 @@ const upload = async () => {
       if (!token) {
         throw new Error("Токен авторизации отсутствует");
       }
-      const url = `http://127.0.0.1:8000/admin/table/userprofile?model_name=${selectedTable}`;
+      const url = `admin/table/userprofile?model_name=${selectedTable}`;
       console.log("Fetching data from:", url);
-      const response = await fetch(url, {
+      const response = await http.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) {
-        throw new Error(`Ошибка при загрузке данных: ${response.status} ${response.statusText}`);
-      }
-      const d: ServerResponse = await response.json();
+
+      const d: ServerResponse = await response.data;
       console.log("Server response:", d);
 
       if (!Array.isArray(d.columns) || !Array.isArray(d.data)) {
@@ -212,16 +212,23 @@ const upload = async () => {
     const fetchFormulas = async () => {
       try {
         const token = await getToken();
-        const response = await fetch("http://127.0.0.1:8000/chemicals/formulas", {
+        const response = await http.get("/chemicals/source", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        if (!response.ok) {
+        const da: string[] = response.data;
+        setPercentFormulas(da);
+        const respons = await http.get("/chemicals/all", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response) {
           throw new Error("Failed to fetch data");
         }
-        const da: string[] = await response.json();
-        setFormulas(da);
+        const d: string[] = await respons.data;
+        setOperationFormulas(d);
       } catch (err: any) {
         console.error(err.message);
       }
@@ -230,15 +237,13 @@ const upload = async () => {
     const fetchItems = async () => {
       try {
         const token = await getToken();
-        const response = await fetch("http://127.0.0.1:8000/admin/tables", {
+        const response = await http.get("/admin/tables", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const data: { tables: string[] } = await response.json();
+
+        const data: { tables: string[] } = response.data;
         const filteredTables = data.tables.filter(
           (table: string) => table !== "userprofile"
         );
@@ -270,8 +275,8 @@ const upload = async () => {
       const token = Cookies.get("token");
       const trimmedFormula = target_formula.slice(1, -1);
       const add_response = await http.post(
-        "http://127.0.0.1:8000/admin/materials/",
-{
+        "/admin/materials/",
+        {
           id: null,
           formula: trimmedFormula,
           source_check: sourceCheck,
@@ -285,7 +290,7 @@ const upload = async () => {
       );
       setMass("");
       setFormula("");
-      setSourceCheck("false"); 
+      setSourceCheck("false");
       if (selectedTable === "chemicalobjects") {
         await update("chemicalobjects");
       }
@@ -304,7 +309,7 @@ const upload = async () => {
       if (!token) {
         throw new Error("Токен авторизации отсутствует");
       }
-      await http.delete(`http://127.0.0.1:8000/admin/chemical/{object_id}?chemical_object=${chemicalObject}`, {
+      await http.delete(`admin/chemical/{object_id}?chemical_object=${chemicalObject}`, {
         headers: {
           accept: "*/*",
           Authorization: `Bearer ${token}`,
@@ -327,7 +332,7 @@ const upload = async () => {
     const token = await getToken();
     if (!token) return;
     console.log("Delete request body:", selectedPercent);
-    await http.delete(`http://127.0.0.1:8000/admin/chemical-composition`, {
+    await http.delete(`admin/chemical-composition`, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",
@@ -361,7 +366,7 @@ const upload = async () => {
     try {
       const token = await getToken();
       if (!token) return;
-      await http.delete(`http://127.0.0.1:8000/admin/chemical-operation`, {
+      await http.delete(`admin/chemical-operation`, {
         headers: {
           Authorization: `Bearer ${token}`,
           accept: "application/json",
@@ -397,21 +402,22 @@ const upload = async () => {
   const viewForm = () => {
     setView(!view);
   };
+
   const AddPercentElements = async () => {
     try {
       const token = Cookies.get("token");
       const add_response = await http.post(
-        "http://127.0.0.1:8000/admin/chemical-composition/",
+        "/admin/chemical-composition/",
         {
           formula: formula,
           metal_composition: {
-            Fe_percent : Fe,
-            Si_percent : Si,
-            K_percent : K,
-            Ca_percent : Ca,
-            Mg_percent : Mg,
-            Na_percent : Na
-          }
+            Fe_percent: Fe,
+            Si_percent: Si,
+            K_percent: K,
+            Ca_percent: Ca,
+            Mg_percent: Mg,
+            Na_percent: Na,
+          },
         },
         {
           headers: {
@@ -428,17 +434,18 @@ const upload = async () => {
       console.error("Error adding object:", err.message);
       alert("Ошибка при добавлении объекта: " + err.message);
     }
-  }
-  const addOperation = async ()  => {
+  };
+
+  const addOperation = async () => {
     try {
       const token = Cookies.get("token");
       const add_response = await http.post(
-        "http://127.0.0.1:8000/admin/chemical-operation/",
+        "/admin/chemical-operation/",
         {
-          source : [ source ],
-          target : resultFormula,
-          temperature : temperature,
-          conditions : conditions
+          source: [source],
+          target: resultFormula,
+          temperature: temperature,
+          conditions: conditions,
         },
         {
           headers: {
@@ -446,7 +453,6 @@ const upload = async () => {
           },
         }
       );
-      
       if (selectedTable === "chemicaloperations") {
         await update("chemicaloperations");
       }
@@ -454,8 +460,9 @@ const upload = async () => {
       console.error("Error adding object:", err.message);
       alert("Ошибка при добавлении объекта: " + err.message);
     }
-  }
-  return (
+  };
+
+return (
     <div className="subtitle min-h-screen start">
       <DropdownTables
         items={items}
@@ -566,7 +573,7 @@ const upload = async () => {
                       <div className="md:w-1/4 mx-5">
                       <label className="block text-white mb-1 mt-5">Формула (LaTeX)</label>
                       <DropdownFormulas
-                        items={formulas} 
+                        items={percentFormulas} 
                         defaultText="Выберите продукт" 
                         onSelect={(item : any) => {
                           setForm(item);
@@ -676,7 +683,7 @@ const upload = async () => {
                       className="p-2 rounded border border-cyan-800 text-white w-full"/>
                   <label className="block text-white mb-1 mt-5">Формула конечного результата</label>
                     <DropdownFormulas
-                  items={formulas} 
+                  items={operationFormulas} 
                   defaultText="Выберите продукт" 
                   onSelect={(item : any) => {
                     setResultFormula(item);

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 import { useRouter } from "next/navigation";
-import { useState, useRef, useEffect } from 'react';
-import Dropdown from '../components/Dropdown'
+import { useState, useEffect } from "react";
+import Dropdown from "../components/Dropdown";
 import Cookies from "js-cookie";
 import http from "../http-common"
 import { get } from "http";
@@ -13,8 +13,7 @@ const Startpage = () => {
     const [items, setItems] = useState([]);
     const [error, setError] = useState(null);
     const [accept, setAccept] = useState(false)
-    const [errorinput, seErrorInput] = useState(false);
-    const [target_formula, setSelectedProduct] = useState<string | null>(null);
+  const [target_formula, setSelectedProduct] = useState<string | null>(null);
     const [result_mass, setMass] = useState('20');
     const [main_percent, setPure] = useState('>98');
     const [fe_percent, setFe] = useState('<0.015');
@@ -39,6 +38,11 @@ const Startpage = () => {
       na_percent: '',
       general: '',
     });
+// Функция для нормализации формул (удаление двойных слэшей)
+  const formatFormulaForRequest = (formula: string) => {
+    return formula.replace(/\\{2}/g, "\\");
+  };
+
     function parseVariantSteps(variantData: any) {
       if (typeof variantData === "string") return [];
       return Object.keys(variantData)
@@ -80,103 +84,98 @@ const Startpage = () => {
       };
       let isValid = true;
 
-      if (!target_formula) {
-        newErrors.target_formula = 'Выберите продукт';
-        isValid = false;
+    if (!target_formula) {
+      newErrors.target_formula = "Выберите продукт";
+      isValid = false;
+    }
+
+    if (!result_mass || Number(result_mass) <= 0) {
+      newErrors.result_mass = "Масса должна быть положительным числом";
+      isValid = false;
+    }
+    if (!main_percent || Number(main_percent.replace(/[><=]/g, "")) <= 0) {
+      newErrors.main_percent = "Масса должна быть положительным числом";
+      isValid = false;
+    }
+
+    const validatePercent = (value: any, field: any) => {
+      if (!value) {
+        return `${field} обязателен. Используйте число, диапазон (например, 0.1-0.3) или неравенство (например, <0.015)`;
       }
-
-      if (!result_mass || Number(result_mass) <= 0 ) {
-        newErrors.result_mass = 'Масса должна быть положительным числом';
-        isValid = false;
+      const rangeRegex = /^(0\.\d+)-(0\.\d+)$/;
+      const inequalityRegex = /^(>|<|>=|<=)(0\.\d+)$/;
+      const numberRegex = /^0\.\d+$/;
+      if (!rangeRegex.test(value) && !inequalityRegex.test(value) && !numberRegex.test(value)) {
+        return `Неверный формат для ${field}. Используйте число, диапазон (например, 0.1-0.3) или неравенство (например, <0.015)`;
       }
-      if (!main_percent || Number(main_percent) <= 0 ) {
-        newErrors.result_mass = 'Масса должна быть положительным числом';
-        isValid = false;
-      }
-
-      const validatePercent = (value : any, field : any) => {
-        if (!value) {
-          return `${field} обязателен. Используйте число, диапазон (например, 0.1-0.3) или неравенство (например, <0.015)`;
-        }
-        const rangeRegex = /^(0\.\d+)-(0\.\d+)$/;
-        const inequalityRegex = /^(>|<|>=|<=)(0\.\d+)$/;
-        const numberRegex = /^0\.\d+$/;
-        if (  
-          !rangeRegex.test(value) &&
-          !inequalityRegex.test(value) &&
-          !numberRegex.test(value)
-        ) {
-          return `Неверный формат для ${field}. Используйте число, диапазон (например, 0.1-0.3) или неравенство (например, <0.015)`;
-        }
-        return '';
-      };
-
-      newErrors.fe_percent = validatePercent(fe_percent, '% Fe');
-      newErrors.si_percent = validatePercent(si_percent, '% Si');
-      newErrors.k_percent = validatePercent(k_percent, '% K');
-      newErrors.ca_percent = validatePercent(ca_percent, '% Ca');
-      newErrors.mg_percent = validatePercent(mg_percent, '% Mg');
-      newErrors.na_percent = validatePercent(na_percent, '% Na');
-
-      if (
-        newErrors.main_percent ||
-        newErrors.fe_percent ||
-        newErrors.si_percent ||
-        newErrors.k_percent ||
-        newErrors.ca_percent ||
-        newErrors.mg_percent ||
-        newErrors.na_percent
-      ) {
-        isValid = false;
-      }
-
-      setErrors(newErrors);
-      return isValid;
+      return "";
     };
 
-    const handleSubmit = async () => {
-      if (!validateForm()) {
-        return;
-      }
-      const params = new URLSearchParams({
-        main_percent,
-        fe_percent,
-        si_percent,
-        k_percent,
-        ca_percent,
-        mg_percent,
-        na_percent,
-        target_formula:  target_formula ? String(target_formula) : '',
-        result_mass,
-      });
-      try{
-        const token = Cookies.get('token');
-        const queryString = new URLSearchParams(params).toString();
+    newErrors.fe_percent = validatePercent(fe_percent, "% Fe");
+    newErrors.si_percent = validatePercent(si_percent, "% Si");
+    newErrors.k_percent = validatePercent(k_percent, "% K");
+    newErrors.ca_percent = validatePercent(ca_percent, "% Ca");
+    newErrors.mg_percent = validatePercent(mg_percent, "% Mg");
+    newErrors.na_percent = validatePercent(na_percent, "% Na");
 
-        const response = await fetch(`http://127.0.0.1:8000/chemicals/transformations?${queryString}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const answer = await response.json();
-        setServerResponse(answer.data);
-        if (answer.data){
-          setVariants(Object.keys(answer.data));
-        }
-        console.log
+    if (
+      newErrors.main_percent ||
+      newErrors.fe_percent ||
+      newErrors.si_percent ||
+      newErrors.k_percent ||
+      newErrors.ca_percent ||
+      newErrors.mg_percent ||
+      newErrors.na_percent
+    ) {
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      return;
+    }
+    const params = new URLSearchParams({
+      main_percent,
+      fe_percent,
+      si_percent,
+      k_percent,
+      ca_percent,
+      mg_percent,
+      na_percent,
+      target_formula: target_formula ? formatFormulaForRequest(String(target_formula)) : "",
+      result_mass,
+    });
+    try {
+      const token = Cookies.get("token");
+      const queryString = params.toString();
+      console.log("Sending request to /chemicals/transformations with params:", queryString);
+      const response = await http.get(`/chemicals/transformations?${queryString}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const answer = await response.data;
+      console.log("Transformations response:", response.data);
+      setServerResponse(response.data);
+      if (response.data.data) {
+        setVariants(Object.keys(response.data.data));
       }
-      catch (err : any ){
-        console.log(err);
-        setServerResponse(null);
-        setErrors((prev) => ({
-          ...prev,
-          general: 'Ошибка при отправке данных. Попробуйте снова.',
-        }));
-      if (err.response.status == 500 || err.response.status == 400){
-          setInputErr(true);
-      }
+    } catch (err: any) {
+      console.error("Transformations error:", err.message, err.response?.data);
+      setServerResponse(null);
+      setErrors((prev) => ({
+        ...prev,
+        general: "Ошибка при отправке данных. Попробуйте снова.",
+      }));
+      if (err.response?.status === 500 || err.response?.status === 400) {
+        setInputErr(true);
       }
     }
+  };
 
     const handleVariantClick = (variant: string) => {
       setSelectedVariant(variant);
@@ -195,11 +194,11 @@ const Startpage = () => {
     const verifyToken = async () => {
       const token = await getToken();
       if (!token) {
-        router.push('/#');
+        router.push("/#");
         return;
       }
       try {
-        const response = await http.get('http://127.0.0.1:8000/auth/verify', {
+        const response = await http.get("/auth/verify", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -207,42 +206,40 @@ const Startpage = () => {
         if (response.data.is_valid) {
           setAccept(true);
         } else {
-          Cookies.remove('token');
-          router.push('/#');
+          Cookies.remove("token");
+          router.push("/#");
         }
-      } catch (error : any) {
-        console.error('Verification failed:', error.message);
-        Cookies.remove('token');
-        router.push('/#');
+      } catch (error: any) {
+        console.error("Verification failed:", error.message);
+        Cookies.remove("token");
+        router.push("/#");
       }
-    }
-    verifyToken();
-    
-    
+    };
+
     const fetchItems = async () => {
-        try {
-          const token = await getToken();
-          const response = await fetch('http://127.0.0.1:8000/chemicals/formulas', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }); 
-          if (!response.ok) {
-            throw new Error('Failed to fetch data');
-          }
-          const data = await response.json();
-          setItems(data); 
-        } catch (err : any) {
-          setError(err.message);
-        }
-      };
-      fetchItems();}
-  , [router]);
+      try {
+        const token = await getToken();
+        const response = await http.get("/chemicals/target", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = response.data.map(formatFormulaForRequest);
+        console.log("Formulas fetched:", data);
+        setItems(data);
+      } catch (err: any) {
+        console.error("Fetch error:", err.message);
+        setError(err.message);
+      }
+    };
 
+    verifyToken();
+    fetchItems();
+  }, [router]);
 
-   if (!accept) {
+  if (!accept) {
     return <div>Loading...</div>;
-  }  
+  }
 
 const LogOut = () => {
       Cookies.remove('token')
@@ -292,8 +289,8 @@ return (
               <Dropdown
                 items={items}
                 defaultText="Выберите продукт"
-                onSelect={(item: string) => {
-                  setSelectedProduct(item);
+                onSelect={(item: any) => {
+                  setSelectedProduct(formatFormulaForRequest(item));
                   setErrors((prev) => ({ ...prev, target_formula: "" }));
                 }}
               />

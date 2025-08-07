@@ -38,8 +38,8 @@ const Admin = () => {
       }
 
       try {
-        const response = await http.get("http://127.0.0.1:8000/auth/verify", {
-          headers: {
+        const response = await http.get('/auth/verify', {
+          headers: {      
             Authorization: `Bearer ${token}`,
           },
         });
@@ -63,7 +63,7 @@ const Admin = () => {
     return <div className="text-white text-center mt-10">Loading...</div>;
   }
 
-  return (
+return (
     <div className="min-h-screen bg-gradient-to-b from-[#006771] to-[#023136] text-white">
       <Toaster position="top-right" richColors />
       {/* Header */}

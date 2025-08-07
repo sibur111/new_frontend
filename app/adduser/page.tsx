@@ -23,7 +23,7 @@ const AddUserPage = () => {
 
         try {
             const token = Cookies.get('token'); 
-            const add_response = await http.post('http://127.0.0.1:8000/admin/users/', {
+            const add_response = await http.post('/admin/users/', {
                 login : log, 
                 password : pas, 
                 role : rol, 
@@ -56,7 +56,7 @@ const AddUserPage = () => {
       }
 
       try {
-        const response = await http.get('http://127.0.0.1:8000/auth/verify', {
+        const response = await http.get('/auth/verify', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -9,10 +9,6 @@ interface TableData {
   [key: string]: string | number | null;
 }
 
-interface FetchError {
-  message: string;
-}
-
 interface ServerResponse {
   columns: string[];
   data: TableData[];
@@ -65,17 +61,15 @@ const AddUser = () => {
       if (!token) {
         throw new Error("Токен авторизации отсутствует");
       }
-      const url = "http://127.0.0.1:8000/admin/table/userprofile?model_name=userprofile";
-      console.log("Fetching data from:", url);
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`Ошибка при загрузке данных: ${response.status} ${response.statusText}`);
-      }
-      const d: ServerResponse = await response.json();
+      const response = await http.get(
+          "/admin/table/{table_name}?model_name=userprofile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      const d: ServerResponse = await response.data;
       console.log("Server response:", d);
 
       if (!Array.isArray(d.columns) || !Array.isArray(d.data)) {
@@ -112,7 +106,7 @@ const AddUser = () => {
     router.push("/adduser");
   };
 
-  return (
+ return (
     <div className="start subtitle min-h-screen">
       <DynamicTableUsers headers={columns} data={data} onRowSelect={setSelectedLogin}/>
       <div className="md:flex-row flex-col">

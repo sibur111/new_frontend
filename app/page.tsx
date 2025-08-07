@@ -21,16 +21,18 @@ const Mainpage = () => {
   const sectionRef3 = useRef<HTMLElement | null>(null);
   const [admin, setAdmin] = useState(false);
   const [user, setUser] = useState(false);
-
-  const verifyToken = async () => {
-    const token = Cookies.get("token");
-    try {
-      const responsetoken = await http.get("http://127.0.0.1:8000/auth/verify", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (responsetoken.data.role == "user"){
+    function routing(){
+      router.push("/home");
+    }
+        const verifyToken = async () => {
+            const token = Cookies.get('token'); 
+            try {
+              const responsetoken = await http.get('/auth/verify', {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              });
+              if (responsetoken.data.role == "user"){
                 toast("successful login")
                 router.push("/home");
               }
@@ -38,12 +40,11 @@ const Mainpage = () => {
                 toast("successful login")
                 router.push("/admin");
               }
-      
-    } catch (error: any) {
-      console.error("Verification failed:", error.message);
-      Cookies.remove("token");
-    }
-  };
+            } catch (error : any) {
+              console.error('Verification failed:', error.message);
+              Cookies.remove('token');
+            }
+          }
 
   const upload = async (e: React.FormEvent) => {
     if (login_log == "" || password_log == ""){
@@ -82,7 +83,7 @@ const Mainpage = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-    return (
+return (
     <div className="min-h-screen auth text-white">
       <Toaster position="top-right" richColors />
       {/* Header */}
