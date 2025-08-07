@@ -1,42 +1,45 @@
-"use client"
+"use client";
 import { useRouter } from "next/navigation";
-import Image from 'next/image'
-import DynamicTable from '../components/DynamicTable';
+import Image from "next/image";
 import { Toaster } from "sonner";
-
-import { useState, useRef, useEffect } from 'react';
-import http from "../http-common"
+import { useState, useEffect } from "react";
+import http from "../http-common";
 import Cookies from "js-cookie";
 
 const Admin = () => {
+  const router = useRouter();
+  const [accept, setAccept] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    const LogOut = () => {
-      Cookies.remove('token')
-      router.replace('/#')
-    }
-    const router = useRouter();
-    const [accept, setAccept] = useState(false)
-    const routering = () => {
-        router.push("/start")
-    }
-    const addUser = () => {
-        router.push("/add")
-    }
-    const dataRouter = () => {
-        router.push("/data")
-    }
-    useEffect(() => {
-       const verifyToken = async () => {
-       const token = Cookies.get('token'); 
+  const LogOut = () => {
+    Cookies.remove("token");
+    router.replace("/#");
+    setIsMobileMenuOpen(false);
+  };
 
+  const routering = () => {
+    router.push("/start");
+  };
+
+  const addUser = () => {
+    router.push("/add");
+  };
+
+  const dataRouter = () => {
+    router.push("/data");
+  };
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      const token = Cookies.get("token");
       if (!token) {
-        router.replace('/#');
+        router.replace("/#");
         return;
       }
 
       try {
-        const response = await http.get('http://127.0.0.1:8000/auth/verify', {
-          headers: {      
+        const response = await http.get("http://127.0.0.1:8000/auth/verify", {
+          headers: {
             Authorization: `Bearer ${token}`,
           },
         });
@@ -44,25 +47,25 @@ const Admin = () => {
         if (response.data.is_valid) {
           setAccept(true);
         } else {
-          Cookies.remove('token');
-          router.replace('/#');
+          Cookies.remove("token");
+          router.replace("/#");
         }
-      } catch (error : any) {
-        console.error('Verification failed:', error.message);
-        Cookies.remove('token');
-        router.replace('/#');
+      } catch (error: any) {
+        console.error("Verification failed:", error.message);
+        Cookies.remove("token");
+        router.replace("/#");
       }
-    }
-      verifyToken();
+    };
+    verifyToken();
   }, [router]);
 
   if (!accept) {
-    return <div>Loading...</div>; 
-  }  
-    return (
-        <div className="admin subtitle min-h-screen ">
-            <div className=" title">
-              <Toaster position="top-right" richColors />
+    return <div className="text-white text-center mt-10">Loading...</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#006771] to-[#023136] text-white">
+      <Toaster position="top-right" richColors />
       {/* Header */}
       <div className="pt-5 w-full">
       <header className="rounded-3xl mx-10 px-4 py-2 bg-cyan-900 title">
@@ -91,24 +94,43 @@ const Admin = () => {
         </div>        
       </header>
       </div>
-            </div>
-            <div>
-            <p className="text-white text-5xl font-semibold mb-20 mt-10 ml-40 ">Панель администратора</p>
-            <div className="md:flex md:justify-between">
-                <img src={'https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2F72a19f13f63c49f1ba69c3f640c81f50?format=webp&width=800'} className="ml-40"/>
-                <div className="flex-col relative mr-40 md:my-0 my-40 mx-auto">
-                  <div className="my-10">
-                    <button onClick={routering} className=" font-sans mx-40 w-2/3 text-center h-10 flex items-center justify-center font-semibold text-2xl rounded-lg bg-linear-to-r from-orange-600 to-red-600 text-white p-2 active:shadow-none hover:shadow-xl">Подобрать сырье</button>
-                  </div>
-                  <div className="bottom-0 absolute my-10">
-                      <button onClick={addUser} className="font-sans flex items-center justify-center mx-40 text-center w-2/3 h-10 font-semibold text-2xl rounded-lg bg-linear-to-r inp text-white p-2 active:shadow-none hover:shadow-xl">Пользователи</button>
-                      <button onClick={dataRouter} className="flex items-center justify-center font-sans mx-40 text-center w-2/3 h-10 font-semibold text-2xl rounded-lg bg-linear-to-r inp text-white p-2 m-5 active:shadow-none hover:shadow-xl">Добавить данные</button>
-                  </div>
-                </div>
-                
-            </div>
-           </div> 
+
+      <div className="px-4 sm:px-6 md:px-8 lg:px-10 py-8 max-w-7xl mx-auto">
+        <h1 className="text-4xl sm:text-4xl md:text-5xl font-normal subtitle mb-8 sm:mb-12 text-center sm:text-left">
+          Панель администратора
+        </h1>
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
+          <div className="w-full md:w-1/2 flex justify-center md:justify-start">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2Fd8432fa5e9704f3da262a78c1b14494c%2F72a19f13f63c49f1ba69c3f640c81f50?format=webp&width=800"
+              alt="Admin Panel Image"
+              className="max-w-full h-auto w-full sm:w-3/4 md:w-full object-contain"
+            />
+          </div>
+          <div className="w-full md:w-1/2 flex subtitle flex-col items-center md:items-end gap-4">
+            <button
+              onClick={routering}
+              className="w-full sm:w-3/4 md:w-2/3 font-sans font-semibold text-xl sm:text-2xl h-12 flex items-center justify-center rounded-lg bg-gradient-to-r from-orange-600 to-red-600 text-white active:shadow-none hover:shadow-xl"
+            >
+              Подобрать сырье
+            </button>
+            <button
+              onClick={addUser}
+              className="w-full sm:w-3/4 md:w-2/3 font-sans font-semibold text-xl sm:text-2xl h-12 flex items-center justify-center rounded-lg bg-linear-to-r inp  text-white active:shadow-none hover:shadow-xl"
+            >
+              Пользователи
+            </button>
+            <button
+              onClick={dataRouter}
+              className="w-full sm:w-3/4 md:w-2/3 font-sans font-semibold text-xl sm:text-2xl h-12 flex items-center justify-center rounded-lg bg-linear-to-r inp  text-white active:shadow-none hover:shadow-xl"
+            >
+              Добавить данные
+            </button>
+          </div>
         </div>
-    )
-}
-export default Admin; 
+      </div>
+    </div>
+  );
+};
+
+export default Admin;
