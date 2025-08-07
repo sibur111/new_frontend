@@ -9,6 +9,8 @@ import katex from "katex";
 import Dropdown from "../components/DropdownRoles";
 import DropdownFormulas from "../components/DropdownFormulas"
 import DynamicTableOperations from "../components/DynamicTableOperations";
+import DynamicTablePercent from "../components/DynamicTablePercent";
+
 interface TableData {
   [key: string]: string | number | null;
 }
@@ -16,6 +18,16 @@ interface ServerResponse {
   columns: string[];
   data: TableData[];
   count?: number;
+}
+interface PercentData {
+  chemical_id: number;
+  main_percent: number;
+  Fe_percent: number;
+  Si_percent: number;
+  K_percent: number;
+  Ca_percent: number;
+  Mg_percent: number;
+  Na_percent: number;
 }
 
 // Подключаем KaTeX CSS через CDN
@@ -25,7 +37,6 @@ if (typeof window !== "undefined") {
   link.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
   document.head.appendChild(link);
 } 
-
 
 const AddData = () => {
   const [items, setItems] = useState<string[]>([]);
@@ -55,7 +66,7 @@ const AddData = () => {
   const [conditions, setConditions] = useState('')
   const [sourceCheck, setSourceCheck] = useState('false')
   const [chemicalObject, setChemicalObject] = useState<string | null>(null);
-  const [selectedPercent, setSelectedPercent] = useState<string | null>(null);
+  const [selectedPercent, setSelectedPercent] = useState<PercentData | null>(null)
   const [selectedOperation, setSelectedOperation] = useState<{ source_id: string; target_id: string } | null>(null);
 
   const massRegex = /^\d*\.?\d*$/;
@@ -197,7 +208,6 @@ const upload = async () => {
     };
 
     verifyToken();
-    upload();
     const fetchFormulas = async () => {
       try {
         const token = await getToken();
@@ -308,29 +318,30 @@ const upload = async () => {
     }
   }
   const deletePercent = async () => {
-    if (!selectedPercent) {
-      alert("Пожалуйста, выберите объект для удаления");
-      return;
-    }
-    try {
-      const token = Cookies.get("token");
-      if (!token) {
-        throw new Error("Токен авторизации отсутствует");
-      }
-      await http.delete(`http://127.0.0.1:8000/admin/chemical-conposition`, {
-        headers: {
-          accept: "*/*",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      alert(`Объект ${selectedPercent} успешно удален`);
-      await upload(); // Обновляем таблицу
-      setChemicalObject(null);
-    } catch (err: any) {
-      console.error("Error deleting user:", err.response?.data || err.message);
-      alert("Ошибка при удалении объекта: " + (err.response?.data?.detail || err.message));
-    }
+  if (!selectedPercent) {
+    setError("Не выбран состав");
+    return;
   }
+  try {
+    const token = await getToken();
+    if (!token) return;
+    console.log("Delete request body:", selectedPercent);
+    await http.delete(`http://127.0.0.1:8000/admin/chemical-composition`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      data: selectedPercent,
+    });
+    setData(data.filter((item) => item.type_id !== selectedPercent.chemical_id));
+    setSelectedPercent(null);
+    setError(null);
+  } catch (err: any) {
+    setError("Ошибка при удалении состава: " + (err.response?.data?.detail || err.message));
+    console.error("Delete composition error:", err);
+  }
+};
   const deleteOperation = async () => {
     if (!selectedOperation?.source_id || !selectedOperation?.target_id) {
       setError("Не выбраны source_id или target_id");
@@ -513,15 +524,20 @@ const upload = async () => {
           </div>
           )}
           {selectedTable === "percentchemicalelements" && (
-            <div>
-              <DynamicTable  headers={columns} data={data} onRowSelect={setSelectedPercent}/>
+            <div><DynamicTablePercent
+                  headers={columns}
+                  data={data}
+                  onRowSelect={(data : any) => setSelectedPercent(data as PercentData)}
+                />
             <div>
               <button
                   onClick={viewForm}
                   className="active:shadow-none hover:shadow-xl mx-5 font-sans font-semibold text-xl rounded-lg text-white px-3"
                 >+</button>
-                {selectedPercent && (
-        <div className="text-cyan-50 mx-10">Выбран объект: {selectedPercent}</div>
+                {selectedPercent && (<div className="text-cyan-50 mt-4 mx-10">
+                          Выбран состав: <br />
+                          ID: {selectedPercent.chemical_id} <br />
+                        </div>
       )}
                 {view && (
                   <div className="m-10">
@@ -607,7 +623,7 @@ const upload = async () => {
                       Добавить
                     </button>
                     <button
-          onClick={deleteObject}
+          onClick={deletePercent}
           disabled={!deletePercent} // Отключаем кнопку, если не выбран login
           className={`active:shadow-none hover:shadow-xl font-sans font-semibold text-xl rounded-lg p-2 px-4 m-2 ${
             selectedPercent ? 'bg-red-600 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'
