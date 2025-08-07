@@ -8,6 +8,7 @@ import DynamicTable from "../components/DynamicTable";
 import katex from "katex";
 import Dropdown from "../components/DropdownRoles";
 import DropdownFormulas from "../components/DropdownFormulas"
+import DynamicTableOperations from "../components/DynamicTableOperations";
 interface TableData {
   [key: string]: string | number | null;
 }
@@ -451,8 +452,11 @@ const upload = async () => {
                   className="act
                   ive:shadow-none hover:shadow-xl font-sans font-semibold mx-5 text-xl rounded-lg text-white px-3"
                 >+</button>
+                {chemicalObject && (
+                    <div className="text-cyan-50 mx-10">Выбран объект: {chemicalObject}</div>
+                  )}
                 {view && (
-                  <div className="w-1/4 m-10">
+                  <div className="md:w-1/4 m-10">
                     <label className="block text-white mb-1">Формула (LaTeX)</label>
                     <input
                       value={target_formula}
@@ -501,10 +505,8 @@ const upload = async () => {
                     >
                       Удалить объект
                     </button>
-                    {chemicalObject && (
-                    <div className="text-cyan-50 mx-10 mb-20">Выбран объект: {chemicalObject}</div>
-                  )}
                   </div>
+
                 )}
               </div>
             </div>
@@ -518,10 +520,13 @@ const upload = async () => {
                   onClick={viewForm}
                   className="active:shadow-none hover:shadow-xl mx-5 font-sans font-semibold text-xl rounded-lg text-white px-3"
                 >+</button>
+                {selectedPercent && (
+        <div className="text-cyan-50 mx-10">Выбран объект: {selectedPercent}</div>
+      )}
                 {view && (
                   <div className="m-10">
                     <div className=" flex justify-start">
-                      <div className="w-1/4">
+                      <div className="md:w-1/4">
                       <label className="block text-white mb-1 mt-5">Процент чистого вещества</label>
                       <input
                         value={main_percent}
@@ -531,7 +536,7 @@ const upload = async () => {
                         className="p-2 rounded border border-cyan-800 text-white w-full"
                       />
                       </div>
-                      <div className="w-1/4 mx-5">
+                      <div className="md:w-1/4 mx-5">
                       <label className="block text-white mb-1 mt-5">Формула (LaTeX)</label>
                       <DropdownFormulas
                         items={formulas} 
@@ -542,7 +547,7 @@ const upload = async () => {
                         </div>
                     </div>
                       <div className="flex justify-start">
-                      <div className="w-1/4"> 
+                      <div className="md:w-1/4"> 
                         <label className="block text-white mb-1 mt-5">% Fe</label>
                         <input
                           value={Fe}
@@ -568,7 +573,7 @@ const upload = async () => {
                           className="p-2 rounded border border-cyan-800 text-white w-full"
                         />
                       </div>
-                        <div className="w-1/4 mx-5">
+                        <div className="md:w-1/4 mx-5">
                         <label className="block text-white mb-1 mt-5">% Ca</label>
                         <input
                           value={Ca}
@@ -610,9 +615,6 @@ const upload = async () => {
         >
           Удалить объект
         </button>
-        {selectedPercent && (
-        <div className="text-cyan-50 mx-10">Выбран объект: {selectedPercent}</div>
-      )}
                   </div>
                 )}
             </div>
@@ -620,18 +622,23 @@ const upload = async () => {
           )}
           {selectedTable === "chemicaloperations" && (
             <div>
-              <DynamicTable
+              <DynamicTableOperations
                   headers={columns}
                   data={data}
-                  onRowSelect={(data) => setSelectedOperation(data as { source_id: string; target_id: string })}
+                  onRowSelect={(data : any) => setSelectedOperation(data as { source_id: string; target_id: string })}
                 />
             <div className="">
               <button
                   onClick={viewForm}
                   className="active:shadow-none hover:shadow-xl mx-5 font-sans font-semibold text-xl rounded-lg text-white px-3"
                 >+</button>
+                {selectedOperation && (
+        <div className="text-cyan-50 mx-10">
+  Выбран объект: source_id: {selectedOperation.source_id}, target_id: {selectedOperation.target_id || "Не указан"}
+</div>
+      )}
               {view && (
-                <div className="m-10 w-1/4">
+                <div className="m-10 md:w-1/4">
                 <div>
                   <label className="block text-white mb-1 mt-5">id номер исходного сырья</label>
                     <input
@@ -680,11 +687,6 @@ const upload = async () => {
         >
           Удалить объект
         </button>
-        {selectedOperation && (
-        <div className="text-cyan-50 mx-10">
-  Выбран объект: source_id: {selectedOperation.source_id}, target_id: {selectedOperation.target_id || "Не указан"}
-</div>
-      )}
             </div>
               )}
         </div>
